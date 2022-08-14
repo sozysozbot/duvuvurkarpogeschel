@@ -49,7 +49,7 @@ extern "C" void main(int argc, char** argv) {
 
   for (int i = 0; i < lines.size(); ++i) {
     if (i > 0 && (i % page_size) == 0) {
-      fputs("---more---\n", stderr);
+      fputs("---slahurfaes fhasfa fua lurfavo xeumen fla---\n", stderr);
       WaitKey();
     }
     fputs(lines[i].c_str(), stdout);
