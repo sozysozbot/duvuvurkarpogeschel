@@ -38,7 +38,7 @@ array<Vector2D<int>, kCube.size()> scr;
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kCanvasSize + 8, kCanvasSize + 28, 10, 10, "cube");
+    = SyscallOpenWindow(kCanvasSize + 8, kCanvasSize + 28, 10, 10, "cerxe");
   if (err_openwin) {
     exit(err_openwin);
   }
