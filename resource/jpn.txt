@@ -1,9 +1,5 @@
-ようこそ，MikanOSへ！
-MikanOSは計算機科学の教材となることを目指して作られています。
+xux el duvuvurkarpogeschel!
+duvuvurkarpogeschel mol mikanos it.
+mikanos veles laoziavo cixj kantiel litarlergyllyr.
 
-Википедия расположена на серверах Фонда Викимедиа
-Wikipedia is hosted by the Wikimedia Foundation
-Саудовская Аравия занимает около 80 % территории Аравийского полуострова.
-Саудовская Аравия занимает 80 % около 80 % территории Аравийского полуострова.
-Саудовская Аравия 80 % занимает 80 % около 80 % территории Аравийского полуострова.
-リポジトリ→ https://github.com/uchan-nos/mikanos
+noner mol fal https://github.com/uchan-nos/mikanos

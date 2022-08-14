@@ -128,7 +128,7 @@ extern "C" void KernelMainNewStack(
   InitializeGraphics(frame_buffer_config_ref);
   InitializeConsole();
 
-  printk("Welcome to MikanOS!\n");
+  printk("xux el duvuvurkarpogeschel!\n");
   SetLogLevel(kWarn);
 
   InitializeSegmentation();
