@@ -11,7 +11,7 @@ extern "C" void main(int argc, char** argv) {
   }
   FILE* fp = fopen(filename, "r");
   if (!fp) {
-    printf("failed to open %s\n", filename);
+    printf("mi nix mels jielujo %s\n", filename);
     exit(1);
   }
 
@@ -32,7 +32,7 @@ extern "C" void main(int argc, char** argv) {
     buf += 4096;
   }
   total += n;
-  printf("size of %s = %lu bytes\n", filename, total);
+  printf("%s letix %lu'd mej\n", filename, total);
 
   size_t num = 0;
   for (int i = 0; i < total; ++i) {
@@ -40,6 +40,6 @@ extern "C" void main(int argc, char** argv) {
       ++num;
     }
   }
-  printf("the number of '%c' (0x%02x) = %lu\n", ch, ch, num);
+  printf("mal letix %lu'd '%c' (0x%02x).\n", num, ch, ch);
   exit(0);
 }
