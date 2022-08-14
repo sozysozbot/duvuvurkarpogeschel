@@ -55,7 +55,7 @@ std::shared_ptr<ToplevelWindow> main_window;
 unsigned int main_window_layer_id;
 void InitializeMainWindow() {
   main_window = std::make_shared<ToplevelWindow>(
-      160, 52, screen_config.pixel_format, "Hello Window");
+      160, 52, screen_config.pixel_format, "kinfiter");
 
   main_window_layer_id = layer_manager->NewLayer()
     .SetWindow(main_window)
@@ -73,7 +73,7 @@ void InitializeTextWindow() {
   const int win_h = 52;
 
   text_window = std::make_shared<ToplevelWindow>(
-      win_w, win_h, screen_config.pixel_format, "Text Box Test");
+      win_w, win_h, screen_config.pixel_format, "slahurfaesal");
   DrawTextbox(*text_window->InnerWriter(), {0, 0}, text_window->InnerSize());
 
   text_window_layer_id = layer_manager->NewLayer()
@@ -224,7 +224,7 @@ extern "C" void KernelMainNewStack(
           task_manager->SendMessage(task_it->second, *msg);
           __asm__("sti");
         } else {
-          printk("key push not handled: keycode %02x, ascii %02x\n",
+          printk("slahurfaeso veles niv ferleso. lysolarakrapt m'es %02x, es %02x fal ackir.\n",
               msg->arg.keyboard.keycode,
               msg->arg.keyboard.ascii);
         }
