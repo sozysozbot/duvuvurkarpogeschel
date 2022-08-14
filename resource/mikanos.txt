@@ -61,6 +61,10 @@ mejfert	ファイル内の特定バイトの個数を求める
 banmis	バンミスを表示する
 tarmzi	皇論之書を表示する
 xel_aklu	画像ビューア
+iska	OS をバグらせようと企む
+
+なお、現状、iska kr_sysital とすると OS が本当にバグります。
+これは MikanOS day30f のバグです。
 
 ## アプリを終了する
 
