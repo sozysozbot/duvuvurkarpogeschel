@@ -55,7 +55,7 @@ uint32_t GetColorGray(unsigned char* image_data) {
 
 extern "C" void main(int argc, char** argv) {
   if (argc < 2) {
-    fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+    fprintf(stderr, "liusel: %s <chertif>\n", argv[0]);
     exit(1);
   }
 
@@ -66,11 +66,11 @@ extern "C" void main(int argc, char** argv) {
   unsigned char* image_data = stbi_load_from_memory(
       content, filesize, &width, &height, &bytes_per_pixel, 0);
   if (image_data == nullptr) {
-    fprintf(stderr, "failed to load image: %s\n", stbi_failure_reason());
+    fprintf(stderr, "mi nix mels moutergo aklurpti'a l'es %s\n", stbi_failure_reason());
     exit(1);
   }
 
-  fprintf(stderr, "%dx%d, %d bytes/pixel\n", width, height, bytes_per_pixel);
+  fprintf(stderr, "横 : %d. 縦 : %d. larl letix %d'd mej.\n", width, height, bytes_per_pixel);
   auto get_color = GetColorRGB;
   if (bytes_per_pixel <= 2) {
     get_color = GetColorGray;

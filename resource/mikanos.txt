@@ -49,16 +49,18 @@ MikanOS の多くの作業はターミナルから実行します。アプリの
 feucocar	ブロック崩しゲーム
 therdaes	ファイルコピー
 cerxe	立方体の 3D 表示デモ
+chaiss	線の表示デモ
+kotielss	点の表示デモ
 fiurs	マウスを追いかける目玉
 fla_leus	ファイルをページ送りで見る
 selsurle	マウスでお絵かき
 rpn	逆ポーランド記法電卓
-sort	行の並べ替え
 lurfa_kr	テキストビューア
 mili	時間が経つのを待つ（単位は sinestususn）
 mejfert	ファイル内の特定バイトの個数を求める
 banmis	バンミスを表示する
 tarmzi	皇論之書を表示する
+xel_aklu	画像ビューア
 
 ## アプリを終了する
 
