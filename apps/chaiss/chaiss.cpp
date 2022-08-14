@@ -23,7 +23,7 @@ constexpr uint32_t Color(int deg) {
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kRadius * 2 + 10 + 8, kRadius + 28, 10, 10, "lines");
+    = SyscallOpenWindow(kRadius * 2 + 10 + 8, kRadius + 28, 10, 10, "chaiss");
   if (err_openwin) {
     exit(err_openwin);
   }
