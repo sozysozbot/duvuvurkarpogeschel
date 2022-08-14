@@ -20,7 +20,7 @@ extern "C" void main(int argc, char** argv) {
       printf("%lu msecs elapsed!\n", duration_ms);
       break;
     } else {
-      printf("unknown event: type = %d\n", events[0].type);
+      printf("qunenerfe volesosti. akrapt es %d\n", events[0].type);
     }
   }
   exit(0);

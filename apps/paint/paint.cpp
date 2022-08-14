@@ -39,7 +39,7 @@ extern "C" void main(int argc, char** argv) {
         SyscallWinFillRectangle(layer_id, arg.x, arg.y, 1, 1, 0x000000);
       }
     } else {
-      printf("unknown event: type = %d\n", events[0].type);
+      printf("qunenerfe volesosti. akrapt es %d\n", events[0].type);
     }
   }
 

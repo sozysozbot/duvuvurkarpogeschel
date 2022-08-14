@@ -28,7 +28,7 @@ extern "C" void main(int argc, char** argv) {
         events[0].type == AppEvent::kKeyPush) {
       // ignore
     } else {
-      printf("unknown event: type = %d\n", events[0].type);
+      printf("qunenerfe volesosti. akrapt es %d\n", events[0].type);
     }
   }
   SyscallCloseWindow(layer_id);
