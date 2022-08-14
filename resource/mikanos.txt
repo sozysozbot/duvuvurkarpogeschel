@@ -51,7 +51,7 @@ cp	ファイルコピー
 cerxe	立方体の 3D 表示デモ
 fiurs	マウスを追いかける目玉
 more	ファイルをページ送りで見る
-paint	マウスでお絵かき
+selsurle	マウスでお絵かき
 rpn	逆ポーランド記法電卓
 sort	行の並べ替え
 tview	テキストビューア

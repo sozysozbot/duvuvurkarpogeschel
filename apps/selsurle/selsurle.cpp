@@ -11,7 +11,7 @@ bool IsInside(int x, int y) {
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kWidth + 8, kHeight + 28, 10, 10, "paint");
+    = SyscallOpenWindow(kWidth + 8, kHeight + 28, 10, 10, "selsurle");
   if (err_openwin) {
     exit(err_openwin);
   }
