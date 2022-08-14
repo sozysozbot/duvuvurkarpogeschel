@@ -25,7 +25,7 @@ void DrawEye(uint64_t layer_id_flags,
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kCanvasSize + 8, kCanvasSize + 28, 10, 10, "eye");
+    = SyscallOpenWindow(kCanvasSize + 8, kCanvasSize + 28, 10, 10, "fiurs");
   if (err_openwin) {
     exit(err_openwin);
   }
