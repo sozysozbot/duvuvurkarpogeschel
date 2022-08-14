@@ -179,7 +179,7 @@ void InitializeFont() {
     exit(1);
   }
 
-  auto [ entry, pos_slash ] = fat::FindFile("/nihongo.ttf");
+  auto [ entry, pos_slash ] = fat::FindFile("/cirlxarl.ttf");
   if (entry == nullptr || pos_slash) {
     exit(1);
   }
