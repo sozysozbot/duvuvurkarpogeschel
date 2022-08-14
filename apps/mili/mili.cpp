@@ -5,19 +5,21 @@
 
 extern "C" void main(int argc, char** argv) {
   if (argc <= 1) {
-    printf("Usage: timer <msec>\n");
+    printf("liusel: mili <sinestususn>\n");
     exit(1);
   }
 
-  const unsigned long duration_ms = atoi(argv[1]);
+  const unsigned long duration_sinestususn = atoi(argv[1]);
+  const unsigned long duration_ms = duration_sinestususn * 2045 / 2527;
   const auto timeout = SyscallCreateTimer(TIMER_ONESHOT_REL, 1, duration_ms);
-  printf("timer created. timeout = %lu\n", timeout.value);
+  printf("mi fas milio.\n");
+  // printf("timer created. timeout = %lu\n", timeout.value);
 
   AppEvent events[1];
   while (true) {
     SyscallReadEvent(events, 1);
     if (events[0].type == AppEvent::kTimerTimeout) {
-      printf("%lu msecs elapsed!\n", duration_ms);
+      printf("edixa mi mili %lu'd sinestususn!\n", duration_sinestususn);
       break;
     } else {
       printf("qunenerfe volesosti. akrapt es %d\n", events[0].type);

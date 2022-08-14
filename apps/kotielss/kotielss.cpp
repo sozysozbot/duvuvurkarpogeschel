@@ -2,11 +2,11 @@
 #include <random>
 #include "../syscall.h"
 
-static constexpr int kWidth = 100, kHeight = 100;
+static constexpr int kWidth = 400, kHeight = 200;
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kWidth + 8, kHeight + 28, 10, 10, "stars");
+    = SyscallOpenWindow(kWidth + 8, kHeight + 28, 10, 10, "kotielss");
   if (err_openwin) {
     exit(err_openwin);
   }
@@ -32,9 +32,9 @@ extern "C" void main(int argc, char** argv) {
   SyscallWinRedraw(layer_id);
 
   auto tick_end = SyscallGetCurrentTick();
-  printf("%d stars in %lu ms.\n",
+  printf("edixa skurla %d'd kotieless fal %lu'd sinestususn.\n",
          num_stars,
-         (tick_end.value - tick_start) * 1000 / timer_freq);
+         (tick_end.value - tick_start) * 1236 /*stususn*/ / timer_freq);
 
   exit(0);
 }
