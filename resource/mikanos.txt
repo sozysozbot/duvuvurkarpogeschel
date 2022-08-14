@@ -57,6 +57,8 @@ sort	行の並べ替え
 lurfa_kr	テキストビューア
 mili	時間が経つのを待つ（単位は sinestususn）
 mejfert	ファイル内の特定バイトの個数を求める
+banmis	バンミスを表示する
+tarmzi	皇論之書を表示する
 
 ## アプリを終了する
 
