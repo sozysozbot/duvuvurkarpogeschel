@@ -36,7 +36,7 @@ extern "C" void main(int argc, char** argv) {
   while (true) {
     auto [ n, err ] = SyscallReadEvent(events, 1);
     if (err) {
-      printf("ReadEvent failed: %s\n", strerror(err));
+      printf("mi nix mels xelo voleso. %s\n", strerror(err));
       break;
     }
     if (events[0].type == AppEvent::kQuit) {

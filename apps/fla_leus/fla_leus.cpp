@@ -10,7 +10,7 @@ AppEvent WaitKey() {
   while (true) {
     auto [ n, err ] = SyscallReadEvent(events, 1);
     if (err) {
-      fprintf(stderr, "ReadEvent failed: %s\n", strerror(err));
+      fprintf(stderr, "mi nix mels xelo voleso. %s\n", strerror(err));
       exit(1);
     }
 

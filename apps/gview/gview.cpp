@@ -33,7 +33,7 @@ void WaitEvent() {
   while (true) {
     auto [ n, err ] = SyscallReadEvent(events, 1);
     if (err) {
-      fprintf(stderr, "ReadEvent failed: %s\n", strerror(err));
+      fprintf(stderr, "mi nix mels xelo voleso. %s\n", strerror(err));
       return;
     }
     if (events[0].type == AppEvent::kQuit) {
