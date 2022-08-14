@@ -64,7 +64,7 @@ T LimitRange(const T& x, const T& min, const T& max) {
 
 extern "C" void main(int argc, char** argv) {
   auto [layer_id, err_openwin]
-    = SyscallOpenWindow(kCanvasWidth + 8, kCanvasHeight + 28, 10, 10, "blocks");
+    = SyscallOpenWindow(kCanvasWidth + 8, kCanvasHeight + 28, 10, 10, "feucocar");
   if (err_openwin) {
     exit(err_openwin);
   }
