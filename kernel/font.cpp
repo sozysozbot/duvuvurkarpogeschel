@@ -9,16 +9,22 @@
 #include <cstdlib>
 #include <vector>
 #include <bit>
+#include <algorithm>
 
 #include "fat.hpp"
+
+struct LinMarnGlyph {
+  uint32_t code_point;
+  uint16_t glyph[16];
+};
 
 extern const uint8_t _binary_hankaku_bin_start;
 extern const uint8_t _binary_hankaku_bin_end;
 extern const uint8_t _binary_hankaku_bin_size;
 
-extern const uint16_t _binary_lin_marn_bin_start;
-extern const uint16_t _binary_lin_marn_bin_end;
-extern const uint8_t _binary_lin_marn_bin_size;
+extern const LinMarnGlyph _binary_lin_marn_bin_start[];
+// extern const uint8_t _binary_lin_marn_bin_end;
+// extern const uint8_t _binary_lin_marn_bin_size;
 
 namespace {
 
@@ -136,6 +142,10 @@ WithError<FT_Face> NewFTFace() {
   return { face, MAKE_ERROR(Error::kSuccess) };
 }
 
+bool CompLinMarnGlyph(const LinMarnGlyph &a, const LinMarnGlyph &b) {
+  return a.code_point < b.code_point;
+};
+
 Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
                   char32_t c, const PixelColor& color) {
   if (c <= 0x7f) {
@@ -143,65 +153,11 @@ Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
     return MAKE_ERROR(Error::kSuccess);
   }
 
-  if (c == 0x5fc3) /* 心 */ {
-    const uint16_t *glyph = reinterpret_cast<const uint16_t *>(&_binary_lin_marn_bin_start) + 8;
-    for (int dy = 0; dy < 16; ++dy) {
-      // we need to fix the endian
-      uint16_t byte_flipped = (glyph[dy] >> 8) | (glyph[dy] << 8);
-      for (int dx = 0; dx < 16; ++dx) {
-        if ((byte_flipped << dx) & 0x8000u) {
-          writer.Write(pos + Vector2D<int>{dx, dy}, color);
-        }
-      }
-    }
-    return MAKE_ERROR(Error::kSuccess);
-  } else if (c == 0x6a2a) /* 横 */ {
-    const uint16_t glyph[16] = {
-      0b0000000000000000,
-      0b0000000000000000,
-      0b0000000010000000,
-      0b0000010010000000,
-      0b0000010010000000,
-      0b0000010010000000,
-      0b0000011010000000,
-      0b0000010010000000,
-      0b0000110011100000,
-      0b0001010010011000,
-      0b0010010010000100,
-      0b0100010010000000,
-      0b0000010010000000,
-      0b0000110010000000,
-      0b0000000000000000,
-      0b0000000000000000,
-   
-    };
-    for (int dy = 0; dy < 16; ++dy) {
-      for (int dx = 0; dx < 16; ++dx) {
-        if ((glyph[dy] << dx) & 0x8000u) {
-          writer.Write(pos + Vector2D<int>{dx, dy}, color);
-        }
-      }
-    }
-    return MAKE_ERROR(Error::kSuccess);
-  } else if (c == 0x7e26) /* 縦 */ {
-    const uint16_t glyph[16] = {
-      0b0000000000000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0001111111110000,
-      0b0000000000000000,
-      0b0000000000000000,
-      0b0001111111110000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000100000000,
-      0b0000000000000000,
-      0b0000000000000000,
-    };
+  // render the glyph if the codepoint exactly matches
+  LinMarnGlyph gl = { c, {} };
+  const LinMarnGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_start + 3, gl, CompLinMarnGlyph);
+  if (candidate->code_point == c) {
+    const uint16_t *glyph = candidate->glyph;
     for (int dy = 0; dy < 16; ++dy) {
       for (int dx = 0; dx < 16; ++dx) {
         if ((glyph[dy] << dx) & 0x8000u) {
