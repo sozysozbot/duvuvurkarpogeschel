@@ -1,6 +1,7 @@
 #include "terminal.hpp"
 
 #include <cstring>
+#include <cctype>
 #include <limits>
 
 #include "font.hpp"
@@ -142,6 +143,39 @@ Error FreePML4(Task& current_task) {
   ResetCR3();
 
   return FreePageMap(reinterpret_cast<PageMapEntry*>(cr3));
+}
+
+void ListEntriesInLowercaseHidingDoubleUnderscore(FileDescriptor& fd, uint32_t dir_cluster) {
+  const auto kEntriesPerCluster =
+    fat::bytes_per_cluster / sizeof(fat::DirectoryEntry);
+
+  while (dir_cluster != fat::kEndOfClusterchain) {
+    auto dir = fat::GetSectorByCluster<fat::DirectoryEntry>(dir_cluster);
+
+    for (int i = 0; i < kEntriesPerCluster; ++i) {
+      if (dir[i].name[0] == 0x00) {
+        return;
+      } else if (static_cast<uint8_t>(dir[i].name[0]) == 0xe5) {
+        continue;
+      } else if (dir[i].attr == fat::Attribute::kLongName) {
+        continue;
+      }
+
+      char name[13];
+      fat::FormatName(dir[i], name);
+      if (name[0] == '_' && name[1] == '_') {
+        // hide
+      } else {
+        int n = strlen(name);
+        for (int i = 0; i < n; i++) {
+          name[i] = tolower(name[i]);
+        }
+        PrintToFD(fd, "%s\n", name);
+      }
+    }
+
+    dir_cluster = fat::NextCluster(dir_cluster);
+  }
 }
 
 void ListAllEntries(FileDescriptor& fd, uint32_t dir_cluster) {
@@ -441,7 +475,7 @@ void Terminal::ExecuteLine() {
           dev.bus, dev.device, dev.function, vendor_id, dev.header_type,
           dev.class_code.base, dev.class_code.sub, dev.class_code.interface);
     }
-  } else if (strcmp(command, "melfertal") == 0) {
+  } else if (strcmp(command, "__ls") == 0) {
     if (!first_arg || first_arg[0] == '\0') {
       ListAllEntries(*files_[1], fat::boot_volume_image->root_cluster);
     } else {
@@ -451,6 +485,27 @@ void Terminal::ExecuteLine() {
         exit_code = 1;
       } else if (dir->attr == fat::Attribute::kDirectory) {
         ListAllEntries(*files_[1], dir->FirstCluster());
+      } else {
+        char name[13];
+        fat::FormatName(*dir, name);
+        if (post_slash) {
+          PrintToFD(*files_[2], "%s es niv chesta.\n", name);
+          exit_code = 1;
+        } else {
+          PrintToFD(*files_[1], "%s\n", name);
+        }
+      }
+    }
+  } else if (strcmp(command, "melfertal") == 0) {
+    if (!first_arg || first_arg[0] == '\0') {
+      ListEntriesInLowercaseHidingDoubleUnderscore(*files_[1], fat::boot_volume_image->root_cluster);
+    } else {
+      auto [ dir, post_slash ] = fat::FindFile(first_arg);
+      if (dir == nullptr) {
+        PrintToFD(*files_[2], "cene niv mi jel chertif o chesta l'es %s\n", first_arg);
+        exit_code = 1;
+      } else if (dir->attr == fat::Attribute::kDirectory) {
+        ListEntriesInLowercaseHidingDoubleUnderscore(*files_[1], dir->FirstCluster());
       } else {
         char name[13];
         fat::FormatName(*dir, name);
@@ -509,7 +564,7 @@ void Terminal::ExecuteLine() {
   } else if (command[0] != 0) {
     auto file_entry = FindCommand(command);
     if (!file_entry) {
-      PrintToFD(*files_[2], "no such command: %s\n", command);
+      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s\n", command);
       exit_code = 1;
     } else {
       auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);
