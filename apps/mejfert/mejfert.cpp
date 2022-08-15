@@ -40,6 +40,6 @@ extern "C" void main(int argc, char** argv) {
       ++num;
     }
   }
-  printf("mal letix %lu'd '%c' (0x%02x).\n", num, ch, ch);
+  printf("mal letix %lu'd '%c' (%d).\n", num, ch, ch);
   exit(0);
 }

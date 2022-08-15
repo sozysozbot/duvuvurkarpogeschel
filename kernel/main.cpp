@@ -224,7 +224,7 @@ extern "C" void KernelMainNewStack(
           task_manager->SendMessage(task_it->second, *msg);
           __asm__("sti");
         } else {
-          printk("slahurfaeso veles niv ferleso. lysolarakrapt m'es %02x, es %02x fal ackir.\n",
+          printk("slahurfaeso veles niv ferleso. lysolarakrapt m'es %d, es %d fal ackir.\n",
               msg->arg.keyboard.keycode,
               msg->arg.keyboard.ascii);
         }
