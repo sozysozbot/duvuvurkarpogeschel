@@ -164,7 +164,9 @@ Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
     }
     for (int dx = 0; dx < bitmap.width; ++dx) {
       const bool b = q[dx >> 3] & (0x80 >> (dx & 0x7));
-      if (b) {
+
+      // fallback to the Japanese font; render the glyph with colors inverted
+      if (!b) {
         writer.Write(glyph_topleft + Vector2D<int>{dx, dy}, color);
       }
     }
@@ -179,7 +181,7 @@ void InitializeFont() {
     exit(1);
   }
 
-  auto [ entry, pos_slash ] = fat::FindFile("/cirlxarl.ttf");
+  auto [ entry, pos_slash ] = fat::FindFile("/__jpnipa.ttf");
   if (entry == nullptr || pos_slash) {
     exit(1);
   }
