@@ -417,22 +417,22 @@ void Terminal::ExecuteLine() {
     (*layer_task_map)[layer_id_] = subtask_id;
   }
 
-  if (strcmp(command, "echo") == 0) {
-    if (first_arg && first_arg[0] == '$') {
-      if (strcmp(&first_arg[1], "?") == 0) {
+  if (strcmp(command, "lkurf") == 0) {
+    if (first_arg && first_arg[0] == '&') {
+      if (strcmp(&first_arg[1], "lex") == 0) {
         PrintToFD(*files_[1], "%d", last_exit_code_);
       }
     } else if (first_arg) {
       PrintToFD(*files_[1], "%s", first_arg);
     }
     PrintToFD(*files_[1], "\n");
-  } else if (strcmp(command, "clear") == 0) {
+  } else if (strcmp(command, "ys") == 0) {
     if (show_window_) {
       FillRectangle(*window_->InnerWriter(),
                     {4, 4}, {8*kColumns, 16*kRows}, {0, 0, 0});
     }
     cursor_.y = 0;
-  } else if (strcmp(command, "lspci") == 0) {
+  } else if (strcmp(command, "__lspci") == 0) {
     for (int i = 0; i < pci::num_device; ++i) {
       const auto& dev = pci::devices[i];
       auto vendor_id = pci::ReadVendorId(dev.bus, dev.device, dev.function);
@@ -441,13 +441,13 @@ void Terminal::ExecuteLine() {
           dev.bus, dev.device, dev.function, vendor_id, dev.header_type,
           dev.class_code.base, dev.class_code.sub, dev.class_code.interface);
     }
-  } else if (strcmp(command, "ls") == 0) {
+  } else if (strcmp(command, "melfertal") == 0) {
     if (!first_arg || first_arg[0] == '\0') {
       ListAllEntries(*files_[1], fat::boot_volume_image->root_cluster);
     } else {
       auto [ dir, post_slash ] = fat::FindFile(first_arg);
       if (dir == nullptr) {
-        PrintToFD(*files_[2], "No such file or directory: %s\n", first_arg);
+        PrintToFD(*files_[2], "cene niv mi jel chertif o chesta l'es %s\n", first_arg);
         exit_code = 1;
       } else if (dir->attr == fat::Attribute::kDirectory) {
         ListAllEntries(*files_[1], dir->FirstCluster());
@@ -455,26 +455,26 @@ void Terminal::ExecuteLine() {
         char name[13];
         fat::FormatName(*dir, name);
         if (post_slash) {
-          PrintToFD(*files_[2], "%s is not a directory\n", name);
+          PrintToFD(*files_[2], "%s es niv chesta.\n", name);
           exit_code = 1;
         } else {
           PrintToFD(*files_[1], "%s\n", name);
         }
       }
     }
-  } else if (strcmp(command, "cat") == 0) {
+  } else if (strcmp(command, "xel") == 0) {
     std::shared_ptr<FileDescriptor> fd;
     if (!first_arg || first_arg[0] == '\0') {
       fd = files_[0];
     } else {
       auto [ file_entry, post_slash ] = fat::FindFile(first_arg);
       if (!file_entry) {
-        PrintToFD(*files_[2], "no such file: %s\n", first_arg);
+        PrintToFD(*files_[2], "cene niv mi jel chertif l'es %s\n", first_arg);
         exit_code = 1;
       } else if (file_entry->attr != fat::Attribute::kDirectory && post_slash) {
         char name[13];
         fat::FormatName(*file_entry, name);
-        PrintToFD(*files_[2], "%s is not a directory\n", name);
+        PrintToFD(*files_[2], "%s es niv chesta.\n", name);
         exit_code = 1;
       } else {
         fd = std::make_shared<fat::FileDescriptor>(*file_entry);
@@ -491,14 +491,14 @@ void Terminal::ExecuteLine() {
       }
       DrawCursor(true);
     }
-  } else if (strcmp(command, "noterm") == 0) {
+  } else if (strcmp(command, "nyksf") == 0) {
     auto term_desc = new TerminalDescriptor{
       first_arg, true, false, files_
     };
     task_manager->NewTask()
       .InitContext(TaskTerminal, reinterpret_cast<int64_t>(term_desc))
       .Wakeup();
-  } else if (strcmp(command, "memstat") == 0) {
+  } else if (strcmp(command, "__memstat") == 0) {
     const auto p_stat = memory_manager->Stat();
     PrintToFD(*files_[1], "Phys used : %lu frames (%llu MiB)\n",
         p_stat.allocated_frames,
