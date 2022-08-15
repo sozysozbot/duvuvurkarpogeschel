@@ -1,5 +1,11 @@
 #!/bin/sh -eu
 
+cp kernel/asciilip.txt kernel/hankaku.txt
+if [ "${ALPHABET-}" = "latin" ]; then
+  echo "Using Latin Alphabet";
+  cp kernel/asciilat.txt kernel/hankaku.txt
+fi
+
 make ${MAKE_OPTS:-} -C kernel kernel.elf
 
 for MK in $(ls apps/*/Makefile)

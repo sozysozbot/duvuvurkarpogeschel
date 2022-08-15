@@ -1,5 +1,6 @@
 /kernel.elf
 /hankaku.bin
+/asciilip.bin
 *.o
 .*.d
 *.swp
