@@ -138,6 +138,35 @@ Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
     return MAKE_ERROR(Error::kSuccess);
   }
 
+  if (c == 0x5fc3) {
+    const uint16_t font[16] = {
+      0b0000000000000000,
+      0b0000000100000000,
+      0b0000100100100000,
+      0b0000100100100000,
+      0b0000010101000000,
+      0b0011111111111000,
+      0b0000000100000000,
+      0b0000001010000000,
+      0b0000001010000000,
+      0b0000010001000000,
+      0b0000010001000000,
+      0b0000100000100000,
+      0b0001000000010000,
+      0b0110000000001100,
+      0b0000000000000000,
+      0b0000000000000000,
+    };
+    for (int dy = 0; dy < 16; ++dy) {
+      for (int dx = 0; dx < 16; ++dx) {
+        if ((font[dy] << dx) & 0x8000u) {
+          writer.Write(pos + Vector2D<int>{dx, dy}, color);
+        }
+      }
+    }
+    return MAKE_ERROR(Error::kSuccess);
+  }
+
   auto [ face, err ] = NewFTFace();
   if (err) {
     WriteAscii(writer, pos, '?', color);
