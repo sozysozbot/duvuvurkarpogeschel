@@ -23,8 +23,8 @@ extern const uint8_t _binary_hankaku_bin_end;
 extern const uint8_t _binary_hankaku_bin_size;
 
 extern const LinMarnGlyph _binary_lin_marn_bin_start[];
-// extern const uint8_t _binary_lin_marn_bin_end;
-// extern const uint8_t _binary_lin_marn_bin_size;
+extern const LinMarnGlyph _binary_lin_marn_bin_end[];
+extern const uint8_t _binary_lin_marn_bin_size;
 
 namespace {
 
@@ -155,7 +155,7 @@ Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
 
   // render the glyph if the codepoint exactly matches
   LinMarnGlyph gl = { c, {} };
-  const LinMarnGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_start + 3, gl, CompLinMarnGlyph);
+  const LinMarnGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_end, gl, CompLinMarnGlyph);
   if (candidate->code_point == c) {
     const uint16_t *glyph = candidate->glyph;
     for (int dy = 0; dy < 16; ++dy) {
