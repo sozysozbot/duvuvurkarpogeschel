@@ -52,6 +52,9 @@ hankaku.bin: hankaku.txt
 hankaku.o: hankaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
+lin_marn.bin: linglyph.txt
+	../tools/lin_font.py -o $@ $<
+
 lin_marn.o: lin_marn.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
