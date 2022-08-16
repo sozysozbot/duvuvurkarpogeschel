@@ -86,6 +86,7 @@ void WriteGlitched(PixelWriter& writer, Vector2D<int> pos, const PixelColor& col
   }
 }
 
+[[deprecated("should always write in Unicode")]]
 void WriteAscii(PixelWriter& writer, Vector2D<int> pos, char c, const PixelColor& color) {
   HalfwidthGlyph gl = { static_cast<uint32_t>(c), {} };
   const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
