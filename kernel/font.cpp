@@ -13,28 +13,33 @@
 
 #include "fat.hpp"
 
-struct LinMarnGlyph {
+struct HalfwidthGlyph {
+  uint32_t code_point;
+  uint8_t glyph[16];
+};
+
+struct FullwidthGlyph {
   uint32_t code_point;
   uint16_t glyph[16];
 };
 
-extern const uint8_t _binary_hankaku_bin_start;
-extern const uint8_t _binary_hankaku_bin_end;
+extern const HalfwidthGlyph _binary_hankaku_bin_start[];
+extern const HalfwidthGlyph _binary_hankaku_bin_end[];
 extern const uint8_t _binary_hankaku_bin_size;
 
-extern const LinMarnGlyph _binary_lin_marn_bin_start[];
-extern const LinMarnGlyph _binary_lin_marn_bin_end[];
+extern const FullwidthGlyph _binary_lin_marn_bin_start[];
+extern const FullwidthGlyph _binary_lin_marn_bin_end[];
 extern const uint8_t _binary_lin_marn_bin_size;
 
 namespace {
-
+/*
 const uint8_t* GetAsciiGlyph(char c) {
   auto index = 16 * static_cast<unsigned int>(c);
   if (index >= reinterpret_cast<uintptr_t>(&_binary_hankaku_bin_size)) {
     return nullptr;
   }
   return &_binary_hankaku_bin_start + index;
-}
+}*/
 
 FT_Library ft_library;
 std::vector<uint8_t>* nihongo_buf;
@@ -54,17 +59,56 @@ Error RenderUnicode(char32_t c, FT_Face face) {
 
 } // namespace
 
-void WriteAscii(PixelWriter& writer, Vector2D<int> pos, char c, const PixelColor& color) {
-  const uint8_t* glyph = GetAsciiGlyph(c);
-  if (glyph == nullptr) {
-    return;
-  }
+bool CompFullwidthGlyph(const FullwidthGlyph &a, const FullwidthGlyph &b) {
+  return a.code_point < b.code_point;
+}
+
+bool CompHalfwidthGlyph(const HalfwidthGlyph &a, const HalfwidthGlyph &b) {
+  return a.code_point < b.code_point;
+}
+
+void WriteGlitched(PixelWriter& writer, Vector2D<int> pos, const PixelColor& color) {
+  const uint8_t glyph[16] = {
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+    0b00110011,
+    0b11001100,
+  };
   for (int dy = 0; dy < 16; ++dy) {
     for (int dx = 0; dx < 8; ++dx) {
       if ((glyph[dy] << dx) & 0x80u) {
         writer.Write(pos + Vector2D<int>{dx, dy}, color);
       }
     }
+  }
+}
+
+void WriteAscii(PixelWriter& writer, Vector2D<int> pos, char c, const PixelColor& color) {
+  HalfwidthGlyph gl = { static_cast<uint32_t>(c), {} };
+  const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
+  if (candidate->code_point == c) {
+    const uint8_t *glyph = candidate->glyph;
+    for (int dy = 0; dy < 16; ++dy) {
+      for (int dx = 0; dx < 8; ++dx) {
+        if ((glyph[dy] << dx) & 0x80u) {
+          writer.Write(pos + Vector2D<int>{dx, dy}, color);
+        }
+      }
+    }
+  } else {
+    WriteGlitched(writer, pos, color);
   }
 }
 
@@ -142,42 +186,54 @@ WithError<FT_Face> NewFTFace() {
   return { face, MAKE_ERROR(Error::kSuccess) };
 }
 
-bool CompLinMarnGlyph(const LinMarnGlyph &a, const LinMarnGlyph &b) {
-  return a.code_point < b.code_point;
-};
-
 Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
                   char32_t c, const PixelColor& color) {
-  if (c <= 0x7f) {
-    WriteAscii(writer, pos, c, color);
-    return MAKE_ERROR(Error::kSuccess);
-  }
-
+  // Look inside the halfwidth character table
   // render the glyph if the codepoint exactly matches
-  LinMarnGlyph gl = { c, {} };
-  const LinMarnGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_end, gl, CompLinMarnGlyph);
-  if (candidate->code_point == c) {
-    const uint16_t *glyph = candidate->glyph;
-    for (int dy = 0; dy < 16; ++dy) {
-      for (int dx = 0; dx < 16; ++dx) {
-        if ((glyph[dy] << dx) & 0x8000u) {
-          writer.Write(pos + Vector2D<int>{dx, dy}, color);
+  {
+    HalfwidthGlyph gl = { c, {} };
+    const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
+    if (candidate->code_point == c) {
+      const uint8_t *glyph = candidate->glyph;
+      for (int dy = 0; dy < 16; ++dy) {
+        for (int dx = 0; dx < 8; ++dx) {
+          if ((glyph[dy] << dx) & 0x80u) {
+            writer.Write(pos + Vector2D<int>{dx, dy}, color);
+          }
         }
       }
+      return MAKE_ERROR(Error::kSuccess);
     }
-    return MAKE_ERROR(Error::kSuccess);
+  }
+
+  // Look inside the fullwidth character table
+  // render the glyph if the codepoint exactly matches
+  {
+    FullwidthGlyph gl = { c, {} };
+    const FullwidthGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_end, gl, CompFullwidthGlyph);
+    if (candidate->code_point == c) {
+      const uint16_t *glyph = candidate->glyph;
+      for (int dy = 0; dy < 16; ++dy) {
+        for (int dx = 0; dx < 16; ++dx) {
+          if ((glyph[dy] << dx) & 0x8000u) {
+            writer.Write(pos + Vector2D<int>{dx, dy}, color);
+          }
+        }
+      }
+      return MAKE_ERROR(Error::kSuccess);
+    }
   }
 
   auto [ face, err ] = NewFTFace();
   if (err) {
-    WriteAscii(writer, pos, '?', color);
-    WriteAscii(writer, pos + Vector2D<int>{8, 0}, '?', color);
+    WriteGlitched(writer, pos, color);
+    WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
     return err;
   }
   if (auto err = RenderUnicode(c, face)) {
     FT_Done_Face(face);
-    WriteAscii(writer, pos, '?', color);
-    WriteAscii(writer, pos + Vector2D<int>{8, 0}, '?', color);
+    WriteGlitched(writer, pos, color);
+    WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
     return err;
   }
   FT_Bitmap& bitmap = face->glyph->bitmap;
