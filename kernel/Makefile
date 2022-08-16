@@ -1,5 +1,5 @@
 TARGET = kernel.elf
-OBJS = main.o graphics.o mouse.o font.o hankaku.o lin_marn.o newlib_support.o console.o \
+OBJS = main.o graphics.o mouse.o font.o hankaku.o zenkaku.o newlib_support.o console.o \
        pci.o asmfunc.o libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
        window.o layer.o timer.o frame_buffer.o acpi.o keyboard.o task.o terminal.o \
        fat.o syscall.o file.o \
@@ -47,13 +47,13 @@ kernel.elf: $(OBJS) Makefile
 	nasm -f elf64 -o $@ $<
 
 hankaku.bin: hankaku.txt
-	../tools/hankaku.py -o $@ $<
+	../tools/makefont.py --width 8 --height 16 -o $@ $<
 
 hankaku.o: hankaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
 zenkaku.bin: zenkaku.txt
-	../tools/zenkaku.py -o $@ $<
+	../tools/makefont.py --width 16 --height 16 -o $@ $<
 
 zenkaku.o: zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@

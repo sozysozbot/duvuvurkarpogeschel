@@ -11,7 +11,7 @@ BITMAP_PATTERN = re.compile(r'([.*@]+)')
 HEX_PATTERN = re.compile(r'0x([0-9a-f]+)')
 
 
-def compile(src: str) -> bytes:
+def compile(src: str, width: int) -> bytes:
     src = src.lstrip()
     result = []
 
@@ -21,7 +21,7 @@ def compile(src: str) -> bytes:
         if m:
             bits = [(0 if x == '.' else 1) for x in m.group(1)]
             bits_int = functools.reduce(lambda a, b: 2*a + b, bits)
-            result.append(bits_int.to_bytes(1, byteorder='little'))
+            result.append(bits_int.to_bytes(width // 8, byteorder='little'))
         elif n:
             # `print(int('0x10', 0))` gives 16
             codepoint = int(line, 0)
@@ -34,12 +34,15 @@ def compile(src: str) -> bytes:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('font', help='path to a font file')
+    parser.add_argument('--width', help='width of the character, in pixel')
+    # not yet explicitly used, but should validate the input to check that it really holds
+    parser.add_argument('--height', help='height of the character, in pixel') 
     parser.add_argument('-o', help='path to an output file', default='font.out')
     ns = parser.parse_args()
 
     with open(ns.o, 'wb') as out, open(ns.font) as font:
         src = font.read()
-        out.write(compile(src))
+        out.write(compile(src, int(ns.width)))
 
 
 if __name__ == '__main__':
