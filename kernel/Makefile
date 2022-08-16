@@ -47,15 +47,15 @@ kernel.elf: $(OBJS) Makefile
 	nasm -f elf64 -o $@ $<
 
 hankaku.bin: hankaku.txt
-	../tools/makefont.py -o $@ $<
+	../tools/hankaku.py -o $@ $<
 
 hankaku.o: hankaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
-lin_marn.bin: linglyph.txt
-	../tools/lin_font.py -o $@ $<
+zenkaku.bin: zenkaku.txt
+	../tools/zenkaku.py -o $@ $<
 
-lin_marn.o: lin_marn.bin
+zenkaku.o: zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
 .%.d: %.bin

@@ -27,20 +27,11 @@ extern const HalfwidthGlyph _binary_hankaku_bin_start[];
 extern const HalfwidthGlyph _binary_hankaku_bin_end[];
 extern const uint8_t _binary_hankaku_bin_size;
 
-extern const FullwidthGlyph _binary_lin_marn_bin_start[];
-extern const FullwidthGlyph _binary_lin_marn_bin_end[];
-extern const uint8_t _binary_lin_marn_bin_size;
+extern const FullwidthGlyph _binary_zenkaku_bin_start[];
+extern const FullwidthGlyph _binary_zenkaku_bin_end[];
+extern const uint8_t _binary_zenkaku_bin_size;
 
 namespace {
-/*
-const uint8_t* GetAsciiGlyph(char c) {
-  auto index = 16 * static_cast<unsigned int>(c);
-  if (index >= reinterpret_cast<uintptr_t>(&_binary_hankaku_bin_size)) {
-    return nullptr;
-  }
-  return &_binary_hankaku_bin_start + index;
-}*/
-
 FT_Library ft_library;
 std::vector<uint8_t>* nihongo_buf;
 
@@ -210,7 +201,7 @@ Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
   // render the glyph if the codepoint exactly matches
   {
     FullwidthGlyph gl = { c, {} };
-    const FullwidthGlyph *candidate = std::lower_bound(_binary_lin_marn_bin_start, _binary_lin_marn_bin_end, gl, CompFullwidthGlyph);
+    const FullwidthGlyph *candidate = std::lower_bound(_binary_zenkaku_bin_start, _binary_zenkaku_bin_end, gl, CompFullwidthGlyph);
     if (candidate->code_point == c) {
       const uint16_t *glyph = candidate->glyph;
       for (int dy = 0; dy < 16; ++dy) {
