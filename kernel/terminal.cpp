@@ -669,13 +669,13 @@ void Terminal::Print(char32_t c) {
     if (cursor_.x == kColumns) {
       newline();
     }
-    WriteUnicode(*window_->Writer(), CalcCursorPos(), c, {255, 255, 255});
+    WriteUnicodeChar(*window_->Writer(), CalcCursorPos(), c, {255, 255, 255});
     ++cursor_.x;
   } else {
     if (cursor_.x >= kColumns - 1) {
       newline();
     }
-    WriteUnicode(*window_->Writer(), CalcCursorPos(), c, {255, 255, 255});
+    WriteUnicodeChar(*window_->Writer(), CalcCursorPos(), c, {255, 255, 255});
     cursor_.x += 2;
   }
 }

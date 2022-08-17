@@ -108,7 +108,7 @@ void WriteString(PixelWriter& writer, Vector2D<int> pos, const char* s, const Pi
   int x = 0;
   while (*s) {
     const auto [ u32, bytes ] = ConvertUTF8To32(s);
-    WriteUnicode(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
+    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
     s += bytes;
     x += IsHankaku(u32) ? 1 : 2;
   }
@@ -160,10 +160,50 @@ std::pair<char32_t, int> ConvertUTF8To32(const char* u8) {
   }
 }
 
+/**
+ * @returns hankaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
+ */
+const HalfwidthGlyph *GetGlyphFromHankakuBin(char32_t c) {
+  // Look inside the halfwidth character table
+  // The table should be sorted by the code point. Hence std::lower_bound suffices.
+  // return the glyph if the codepoint exactly matches
+  HalfwidthGlyph gl = { c, {} };
+  const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
+  if (candidate->code_point == c) { 
+    return candidate; 
+  } else { 
+    return nullptr; 
+  }
+}
+
+/**
+ * @returns zenkaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
+ */
+const FullwidthGlyph *GetGlyphFromZenkakuBin(char32_t c) {
+  // Look inside the fullwidth character table
+  // The table should be sorted by the code point. Hence std::lower_bound suffices.
+  // return the glyph if the codepoint exactly matches 
+  FullwidthGlyph gl = { c, {} };
+  const FullwidthGlyph *candidate = std::lower_bound(_binary_zenkaku_bin_start, _binary_zenkaku_bin_end, gl, CompFullwidthGlyph);
+  if (candidate->code_point == c) {
+    return candidate; 
+  } else { 
+    return nullptr; 
+  }
+}
+
 bool IsHankaku(char32_t c) {
-  return /* Basic Latin */ c <= 0x7f 
-  || /* Greek and Coptic */ (0x370 <= c && c <= 0x3ff)
-  || /* Cyrillic */  (0x400 <= c && c <= 0x4ff);
+  if (GetGlyphFromHankakuBin(c)) { 
+    return true; /* 半角で表示すべき文字なので true */ 
+  } else if (GetGlyphFromZenkakuBin(c)) { 
+    return false; /* 全角で表示すべき文字なので false */ 
+  } else if (c <= 0x7f) { 
+    return true; 
+    /* 禁じられたグリフ。IPAフォントが半角で表示するので、ここは true */
+  } else {
+    return false;
+    /* 禁じられたグリフ。IPAフォントが全角で表示するので、ここは false */
+  }
 }
 
 WithError<FT_Face> NewFTFace() {
@@ -178,42 +218,30 @@ WithError<FT_Face> NewFTFace() {
   return { face, MAKE_ERROR(Error::kSuccess) };
 }
 
-Error WriteUnicode(PixelWriter& writer, Vector2D<int> pos,
+Error WriteUnicodeChar(PixelWriter& writer, Vector2D<int> pos,
                   char32_t c, const PixelColor& color) {
-  // Look inside the halfwidth character table
-  // render the glyph if the codepoint exactly matches
-  {
-    HalfwidthGlyph gl = { c, {} };
-    const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
-    if (candidate->code_point == c) {
-      const uint8_t *glyph = candidate->glyph;
-      for (int dy = 0; dy < 16; ++dy) {
-        for (int dx = 0; dx < 8; ++dx) {
-          if ((glyph[dy] << dx) & 0x80u) {
-            writer.Write(pos + Vector2D<int>{dx, dy}, color);
-          }
+  if (const HalfwidthGlyph *hankaku = GetGlyphFromHankakuBin(c); hankaku) {
+    const uint8_t *glyph = hankaku->glyph;
+    for (int dy = 0; dy < 16; ++dy) {
+      for (int dx = 0; dx < 8; ++dx) {
+        if ((glyph[dy] << dx) & 0x80u) {
+          writer.Write(pos + Vector2D<int>{dx, dy}, color);
         }
       }
-      return MAKE_ERROR(Error::kSuccess);
     }
+    return MAKE_ERROR(Error::kSuccess);
   }
 
-  // Look inside the fullwidth character table
-  // render the glyph if the codepoint exactly matches
-  {
-    FullwidthGlyph gl = { c, {} };
-    const FullwidthGlyph *candidate = std::lower_bound(_binary_zenkaku_bin_start, _binary_zenkaku_bin_end, gl, CompFullwidthGlyph);
-    if (candidate->code_point == c) {
-      const uint16_t *glyph = candidate->glyph;
-      for (int dy = 0; dy < 16; ++dy) {
-        for (int dx = 0; dx < 16; ++dx) {
-          if ((glyph[dy] << dx) & 0x8000u) {
-            writer.Write(pos + Vector2D<int>{dx, dy}, color);
-          }
+  if (const FullwidthGlyph *zenkaku = GetGlyphFromZenkakuBin(c); zenkaku) {
+    const uint16_t *glyph = zenkaku->glyph;
+    for (int dy = 0; dy < 16; ++dy) {
+      for (int dx = 0; dx < 16; ++dx) {
+        if ((glyph[dy] << dx) & 0x8000u) {
+          writer.Write(pos + Vector2D<int>{dx, dy}, color);
         }
       }
-      return MAKE_ERROR(Error::kSuccess);
     }
+    return MAKE_ERROR(Error::kSuccess);
   }
 
   auto [ face, err ] = NewFTFace();
