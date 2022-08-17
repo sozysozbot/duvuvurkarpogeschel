@@ -546,7 +546,7 @@ void Terminal::ExecuteLine() {
       }
       DrawCursor(true);
     }
-  } else if (strcmp(command, "nyksf") == 0) {
+  } else if (strcmp(command, "ksfnerfe") == 0) {
     auto term_desc = new TerminalDescriptor{
       first_arg, true, false, files_
     };
