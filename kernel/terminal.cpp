@@ -258,7 +258,7 @@ fat::DirectoryEntry* FindCommand(const char* command,
     return nullptr;
   }
 
-  auto apps_entry = fat::FindFile("apps");
+  auto apps_entry = fat::FindFile("cersvass");
   if (apps_entry.first == nullptr ||
       apps_entry.first->attr != fat::Attribute::kDirectory) {
     return nullptr;

@@ -2,6 +2,26 @@
 
 MikanOS リパライン語版
 
+## 計画書兼作業ログ
+
+[ここ](https://docs.google.com/document/d/1wIOPxwwuKzM3AXjePmQmzAJn_1PvlHc2g7eBjgCJTak/edit#)
+
+## ビルド方法
+
+基本的に https://github.com/uchan-nos/mikanos-build を参考にするとよい。「apps ディレクトリにアプリ群を入れ、フォントなどのリソースをも含めたディスクイメージを作る」ための方法は、
+
+```
+APPS_DIR=cersvass RESOURCE_DIR=resource ./build.sh run
+```
+
+へと変更されている。
+
+```
+APPS_DIR=cersvass RESOURCE_DIR=resource ALPHABET=latin ./build.sh run
+```
+
+とすることにより、表示がラテンアルファベットへとすり替わる。
+
 ## 組み込みコマンド紹介
 
 | コマンド名 | 内容 |
