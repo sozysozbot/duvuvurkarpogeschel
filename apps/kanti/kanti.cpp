@@ -4,7 +4,7 @@
 #include "../syscall.h"
 
 const char *ans[][3]= {
-  {"fla_leus", "<chertif>"  "fla leus lurfa chertif"},
+  {"fla_leus", "<chertif>",  "fla leus lurfa chertif"},
   {"fiurs",    "", "fiursusti zu josxe co'st fudiurmo"},
   {"feucocar", "", "feucocarven velfez"},
   {"therdaes", "<ler> <el>", "chertif'i therdaes"},
@@ -19,13 +19,13 @@ const char *ans[][3]= {
   {"lurfa_kr", "<chertif>",  "krantie'i lurfa"},
   {"banmis", "",   "banmis's lurfa"},
   {"selsurle", "", "co'st fudiurmo leus ciliso'i cenees"},
-  {"iska",    "<>"  ,"iskaes fua kirto karpo karpogeschel"},
-  {"ekcanaxm", "<>", "ekcanal leus litarle"}
+ // {"iska",    "<>"  ,"iskaes fua kirto karpo karpogeschel"},
+ // {"ekcanaxm", "<>", "ekcanal leus litarle"}
 };
 
 extern "C" void main(int argc, char** argv) {
   const char* query = "als";
-  if (argc >= 2) {
+    if (argc >= 2) {
     query = argv[1];
   }
   

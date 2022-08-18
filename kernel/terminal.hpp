@@ -32,7 +32,7 @@ struct TerminalDescriptor {
 
 class Terminal {
  public:
-  static const int kRows = 15, kColumns = 60;
+  static const int kRows = 17, kColumns = 48;
   static const int kLineMax = 128;
 
   Terminal(Task& task, const TerminalDescriptor* term_desc);
