@@ -84,6 +84,39 @@ int CountUTF8Size(uint8_t c) {
   return 0;
 }
 
+std::pair<char32_t, int> ConvertUTF8To32(const char* u8) {
+  switch (CountUTF8Size(u8[0])) {
+  case 1:
+    return {
+      static_cast<char32_t>(u8[0]),
+      1
+    };
+  case 2:
+    return {
+      (static_cast<char32_t>(u8[0]) & 0b0001'1111) << 6 |
+      (static_cast<char32_t>(u8[1]) & 0b0011'1111) << 0,
+      2
+    };
+  case 3:
+    return {
+      (static_cast<char32_t>(u8[0]) & 0b0000'1111) << 12 |
+      (static_cast<char32_t>(u8[1]) & 0b0011'1111) << 6 |
+      (static_cast<char32_t>(u8[2]) & 0b0011'1111) << 0,
+      3
+    };
+  case 4:
+    return {
+      (static_cast<char32_t>(u8[0]) & 0b0000'0111) << 18 |
+      (static_cast<char32_t>(u8[1]) & 0b0011'1111) << 12 |
+      (static_cast<char32_t>(u8[2]) & 0b0011'1111) << 6 |
+      (static_cast<char32_t>(u8[3]) & 0b0011'1111) << 0,
+      4
+    };
+  default:
+    return { 0, 0 };
+  }
+}
+
 void CopyUTF8String(char* dst, size_t dst_size,
                     const char* src, size_t src_size,
                     int w, int tab) {
@@ -104,20 +137,20 @@ void CopyUTF8String(char* dst, size_t dst_size,
       continue;
     }
 
-    SyscallResult result = SyscallIsHalfwidth(*src);
-    x += result.value ? 1 : 2;
+    const auto [ u32, bytes ] = ConvertUTF8To32(src);
+    SyscallResult is_halfwidth = SyscallIsHalfwidth(u32);
+    x += is_halfwidth.value ? 1 : 2;
 
     if (x >= w) {
       break;
     }
 
-    int c = CountUTF8Size(*src);
-    if (src + c > src_end || dst + c >= dst_end) {
+    if (src + bytes > src_end || dst + bytes >= dst_end) {
       break;
     }
-    memcpy(dst, src, c);
-    src += c;
-    dst += c;
+    memcpy(dst, src, bytes);
+    src += bytes;
+    dst += bytes;
   }
 
   *dst = '\0';
