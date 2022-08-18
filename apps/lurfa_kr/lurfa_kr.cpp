@@ -104,11 +104,9 @@ void CopyUTF8String(char* dst, size_t dst_size,
       continue;
     }
 
-    if (static_cast<uint8_t>(*src) < 0x80) {
-      x += 1;
-    } else {
-      x += 2;
-    }
+    SyscallResult result = SyscallIsHalfwidth(*src);
+    x += result.value ? 1 : 2;
+
     if (x >= w) {
       break;
     }

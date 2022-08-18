@@ -192,7 +192,7 @@ SYSCALL(CloseWindow) {
   const unsigned int layer_id = arg1 & 0xffffffff;
   const auto err = CloseLayer(layer_id);
   if (err.Cause() == Error::kNoSuchEntry) {
-    return { EBADF, 0 };
+    return { 0, EBADF };
   }
   return { 0, 0 };
 }
@@ -395,6 +395,10 @@ SYSCALL(MapFile) {
   return { vaddr_begin, 0 };
 }
 
+SYSCALL(IsHalfwidth) {
+  return { IsHankaku(arg1), 0 };
+}
+
 #undef SYSCALL
 
 } // namespace syscall
@@ -418,6 +422,7 @@ extern "C" std::array<SyscallFuncType*, 0x10> syscall_table{
   /* 0x0d */ syscall::ReadFile,
   /* 0x0e */ syscall::DemandPages,
   /* 0x0f */ syscall::MapFile,
+  /* 0x10 */ syscall::IsHalfwidth,
 };
 
 void InitializeSyscall() {
