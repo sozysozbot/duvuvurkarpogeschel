@@ -170,7 +170,14 @@ void ListEntriesInLowercaseHidingDoubleUnderscore(FileDescriptor& fd, uint32_t d
         for (int i = 0; i < n; i++) {
           name[i] = tolower(name[i]);
         }
-        PrintToFD(fd, "%s\n", name);
+
+        // censor some names
+        if (strcmp(name, "mikan os") 
+        && strcmp(name, "efi") 
+        && strcmp(name, "kernel.elf") 
+        && strcmp(name, "memmap")) {
+          PrintToFD(fd, "%s\n", name);
+        }
       }
     }
 

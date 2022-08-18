@@ -3,7 +3,7 @@
 #include <cstring>
 #include "../syscall.h"
 
-const char *ans[][3]= {
+const char *cersvass[][3] = {
   {"fla_leus", "<chertif>",  "fla leus lurfa chertif"},
   {"fiurs",    "", "fiursusti zu josxe co'st fudiurmo"},
   {"feucocar", "", "feucocarven velfez"},
@@ -23,21 +23,44 @@ const char *ans[][3]= {
  // {"ekcanaxm", "<>", "ekcanal leus litarle"}
 };
 
+const char *mels_ksf[][3] = {
+  {"ksfnerfe", "<cersva>", "ksfnerfe fenxe cersva"}, 
+  {"lkurf", "<kraxaiun>", "kraxaiun'i lkurf"},
+  {"lkurf &lex", "", "lovik nestilen cersva'd lususurdieniep'i lkurf"},
+  {"xel", "<chertif>", "krantie l'es chertif'i xel" },
+  {"melfertal", "", "melfertalasti fon chertif"},
+  {"melfertal", "<chesta>", "melfertalasti fon chertif z'en chesta'c"},
+  {"ys", "", "ksf io lex mol lyjot'i ys"}
+};
+
 extern "C" void main(int argc, char** argv) {
-  const char* query = "als";
+  const char* query = "";
     if (argc >= 2) {
     query = argv[1];
   }
   
-  if (strcmp(query, "als") == 0) {
-    for (size_t i = 0; i < sizeof ans / sizeof *ans; i++) {
-      printf("%s %s: %s\n", ans[i][0], ans[i][1], ans[i][2]);
+  if (strcmp(query, "") == 0) {
+    printf("fenxe \"kanti mels_ksf\" fua lerssergo mels ksf.\n");
+    printf("fenxe \"kanti cersvass\" fua lerssergo cersvass.\n");
+  } else if (strcmp(query, "cersvass") == 0) {
+    for (size_t i = 0; i < sizeof cersvass / sizeof *cersvass; i++) {
+      printf("%s %s: %s\n", cersvass[i][0], cersvass[i][1], cersvass[i][2]);
+    }
+  } else if (strcmp(query, "mels_ksf") == 0) {
+    for (size_t i = 0; i < sizeof mels_ksf / sizeof *mels_ksf; i++) {
+      printf("%s %s: %s\n", mels_ksf[i][0], mels_ksf[i][1], mels_ksf[i][2]);
     }
   } else {
     bool found = false;
-    for (size_t i = 0; i < sizeof ans / sizeof *ans; i++) {
-      if (strcmp(query, ans[i][0]) == 0) {
-        printf("%s %s: %s\n", ans[i][0], ans[i][1], ans[i][2]);
+    for (size_t i = 0; i < sizeof mels_ksf / sizeof *mels_ksf; i++) {
+      if (strcmp(query, mels_ksf[i][0]) == 0) {
+        printf("%s %s: %s\n", mels_ksf[i][0], mels_ksf[i][1], mels_ksf[i][2]);
+        found = true;
+      }
+    }
+    for (size_t i = 0; i < sizeof cersvass / sizeof *cersvass; i++) {
+      if (strcmp(query, cersvass[i][0]) == 0) {
+        printf("%s %s: %s\n", cersvass[i][0], cersvass[i][1], cersvass[i][2]);
         found = true;
       }
     }
