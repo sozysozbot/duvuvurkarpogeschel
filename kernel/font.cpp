@@ -218,6 +218,9 @@ WithError<FT_Face> NewFTFace() {
   return { face, MAKE_ERROR(Error::kSuccess) };
 }
 
+/**
+ * IsHankaku が true を返す文字なら必ず 8 x 16 の領域を、そうでなければ必ず 16 x 16 の領域を埋める。
+ */
 Error WriteUnicodeChar(PixelWriter& writer, Vector2D<int> pos,
                   char32_t c, const PixelColor& color) {
   if (const HalfwidthGlyph *hankaku = GetGlyphFromHankakuBin(c); hankaku) {
@@ -244,36 +247,55 @@ Error WriteUnicodeChar(PixelWriter& writer, Vector2D<int> pos,
     return MAKE_ERROR(Error::kSuccess);
   }
 
+  // IPA フォントにフォールバックする。白黒反転して描画
+  // fallback to the Japanese font; render the glyph with colors inverted
+
   auto [ face, err ] = NewFTFace();
   if (err) {
     WriteGlitched(writer, pos, color);
-    WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
+    if (c > 0x7f) {
+      WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
+    }
     return err;
   }
   if (auto err = RenderUnicode(c, face)) {
     FT_Done_Face(face);
     WriteGlitched(writer, pos, color);
-    WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
+    if (c > 0x7f) {
+      WriteGlitched(writer, pos + Vector2D<int>{8, 0}, color);
+    }
     return err;
   }
   FT_Bitmap& bitmap = face->glyph->bitmap;
 
   const int baseline = (face->height + face->descender) *
     face->size->metrics.y_ppem / face->units_per_EM;
-  const auto glyph_topleft = pos + Vector2D<int>{
-    face->glyph->bitmap_left, baseline - face->glyph->bitmap_top};
 
-  for (int dy = 0; dy < bitmap.rows; ++dy) {
-    unsigned char* q = &bitmap.buffer[bitmap.pitch * dy];
-    if (bitmap.pitch < 0) {
-      q -= bitmap.pitch * bitmap.rows;
-    }
-    for (int dx = 0; dx < bitmap.width; ++dx) {
-      const bool b = q[dx >> 3] & (0x80 >> (dx & 0x7));
+  const int background_width = c <= 0x7f ? 8 : 16;
+  for (int dy = 0; dy < 16; ++dy) {
+    int dy_relative = dy - (baseline - face->glyph->bitmap_top);
+    if (0 <= dy_relative && dy_relative < bitmap.rows) {
+      unsigned char* q = &bitmap.buffer[bitmap.pitch * dy_relative];
+      if (bitmap.pitch < 0) {
+        q -= bitmap.pitch * bitmap.rows;
+      }
 
-      // fallback to the Japanese font; render the glyph with colors inverted
-      if (!b) {
-        writer.Write(glyph_topleft + Vector2D<int>{dx, dy}, color);
+      for (int dx = 0; dx < background_width; ++dx) {
+        int dx_relative = dx - face->glyph->bitmap_left;
+        if (0 <= dx_relative && dx_relative < bitmap.width) {
+          const bool b = q[dx_relative >> 3] & (0x80 >> (dx_relative & 0x7));
+          if (!b) {
+            writer.Write(pos + Vector2D<int>{dx, dy}, color);
+          }
+        } else {
+          // outside the bounding box; always draw the background
+          writer.Write(pos + Vector2D<int>{dx, dy}, color);
+        }
+      }
+    } else {
+      // outside the bounding box; always draw the background
+      for (int dx = 0; dx < background_width; ++dx) {
+        writer.Write(pos + Vector2D<int>{dx, dy}, color);
       }
     }
   }
