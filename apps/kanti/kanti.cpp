@@ -13,6 +13,7 @@ const char *ans[][3]= {
   {"cerxe",    "", "cerxe'i sisnest"},
   {"xel_aklu", "<chertif>", "aklurpti'a'i lurfa"},
   {"kotielss", "", "kotiel'i skurla"},
+  {"kanti", "<cersva>", "cersva'it liusel'i co'c kanti"},
   {"mili", "<sinestususn>", "liestusnej io mili"},
   {"mejfert", "<chertif> <mej>",  "murtmirme'd mejestan mol fal chertif? la lex'i kinfit"},
   {"lurfa_kr", "<chertif>",  "krantie'i lurfa"},

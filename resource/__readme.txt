@@ -77,6 +77,7 @@ chaiss     線の表示デモ
 cerxe      立方体の 3D 表示デモ
 xel_aklu   画像ビューア
 kotielss   点の表示デモ
+kanti      アプリの機能を説明
 mili       時間が経つのを待つ（単位は sinestususn）
 mejfert    ファイル内の特定バイトの個数を求める
 lurfa_kr   テキストビューア
