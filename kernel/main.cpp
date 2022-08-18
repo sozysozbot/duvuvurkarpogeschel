@@ -129,6 +129,7 @@ extern "C" void KernelMainNewStack(
   InitializeConsole();
 
   printk("xux el duvuvurkarpogeschel!\n");
+  printk("krante \"kanti\" fal ksf fua quneo liusel.\n")
   SetLogLevel(kWarn);
 
   InitializeSegmentation();
