@@ -118,6 +118,8 @@ void InputTextWindow(char c) {
 
 alignas(16) uint8_t kernel_main_stack[1024 * 1024];
 
+
+
 extern "C" void KernelMainNewStack(
     const FrameBufferConfig& physical_frame_buffer_config_ref,
     const MemoryMap& memory_map_ref,
@@ -125,26 +127,37 @@ extern "C" void KernelMainNewStack(
     void* volume_image) {
   MemoryMap memory_map{memory_map_ref};
 
-  assert(physical_frame_buffer_config_ref.horizontal_resolution >= 768);
-  assert(physical_frame_buffer_config_ref.vertical_resolution >= 543);
+  // 本当は画面縦幅は horizontal_resolution、画面横幅は vertical_resolution なのだが、
+  // 768 x 543 の固定幅の画面をエミュレートする。
+  // ただし、それはそれとして枠外に固定の模様は描きたい。こいつは一度書いたら書き換えることはない。
+  {
+    const uint32_t FIXED_HORIZONTAL_RES = 768;
+    const uint32_t FIXED_VERTICAL_RES = 543;
+    assert(physical_frame_buffer_config_ref.horizontal_resolution >= FIXED_HORIZONTAL_RES);
+    assert(physical_frame_buffer_config_ref.vertical_resolution >= FIXED_VERTICAL_RES);
 
-  FrameBufferConfig virtual_frame_buffer_config = {
-    physical_frame_buffer_config_ref.frame_buffer,
-    physical_frame_buffer_config_ref.pixels_per_scan_line,
-    768,
-    543,
-    physical_frame_buffer_config_ref.pixel_format
-  };
+    auto margin_left = (physical_frame_buffer_config_ref.horizontal_resolution - FIXED_HORIZONTAL_RES) / 2;
+    auto margin_top = (physical_frame_buffer_config_ref.vertical_resolution - FIXED_VERTICAL_RES) / 3;
 
-  /*
-  for (int dy = 0; dy < screen_size.y; ++dy) {
-    for (int dx = 0; dx < screen_size.x; ++dx) {
-      (*bgwindow).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
+    FrameBufferConfig virtual_frame_buffer_config = {
+      physical_frame_buffer_config_ref.frame_buffer 
+        + BytesPerPixel(physical_frame_buffer_config_ref.pixel_format) * (physical_frame_buffer_config_ref.pixels_per_scan_line * margin_top + margin_left),
+      physical_frame_buffer_config_ref.pixels_per_scan_line,
+      FIXED_HORIZONTAL_RES,
+      FIXED_VERTICAL_RES,
+      physical_frame_buffer_config_ref.pixel_format
+    };
+
+    /*
+    for (int dy = 0; dy < screen_size.y; ++dy) {
+      for (int dx = 0; dx < screen_size.x; ++dx) {
+        (*bgwindow).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
+      }
     }
-  }
-  */
+    */
 
-  InitializeGraphics(virtual_frame_buffer_config);
+    InitializeGraphics(virtual_frame_buffer_config);
+  }
   InitializeConsole();
 
   printk("xux el duvuvurkarpogeschel!\n");

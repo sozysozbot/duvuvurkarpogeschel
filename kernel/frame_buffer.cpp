@@ -1,14 +1,14 @@
 #include "frame_buffer.hpp"
 
-namespace {
-  int BytesPerPixel(PixelFormat format) {
-    switch (format) {
-      case kPixelRGBResv8BitPerColor: return 4;
-      case kPixelBGRResv8BitPerColor: return 4;
-    }
-    return -1;
+int BytesPerPixel(PixelFormat format) {
+  switch (format) {
+    case kPixelRGBResv8BitPerColor: return 4;
+    case kPixelBGRResv8BitPerColor: return 4;
   }
+  return -1;
+}
 
+namespace {
   uint8_t* FrameAddrAt(Vector2D<int> pos, const FrameBufferConfig& config) {
     return config.frame_buffer + BytesPerPixel(config.pixel_format) *
       (config.pixels_per_scan_line * pos.y + pos.x);
