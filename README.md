@@ -8,7 +8,15 @@ MikanOS リパライン語版
 
 ## ビルド方法
 
-基本的に https://github.com/uchan-nos/mikanos-build を参考にするとよい。「apps ディレクトリにアプリ群を入れ、フォントなどのリソースをも含めたディスクイメージを作る」ための方法は、
+基本的に https://github.com/uchan-nos/mikanos-build を参考にするとよい。
+
+```
+source $HOME/osbook/devenv/buildenv.sh
+```
+
+は毎回走らせる必要があることに注意。
+
+「apps ディレクトリにアプリ群を入れ、フォントなどのリソースをも含めたディスクイメージを作る」ための方法は、
 
 ```
 APPS_DIR=cersvass RESOURCE_DIR=resource ./build.sh run

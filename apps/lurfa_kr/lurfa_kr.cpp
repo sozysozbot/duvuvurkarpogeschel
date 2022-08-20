@@ -141,7 +141,7 @@ void CopyUTF8String(char* dst, size_t dst_size,
     SyscallResult is_halfwidth = SyscallIsHalfwidth(u32);
     x += is_halfwidth.value ? 1 : 2;
 
-    if (x >= w) {
+    if (x > w) {
       break;
     }
 
@@ -227,12 +227,12 @@ bool UpdateStartLine(int* start_line, int height, size_t num_lines) {
 extern "C" void main(int argc, char** argv) {
   auto print_help = [argv](){
     fprintf(stderr,
-            "Usage: %s [-w WIDTH] [-h HEIGHT] [-t TAB] <file>\n",
+            "liusel: %s [-w 横] [-h 縦] [-t konlaval] <chertif>\n",
             argv[0]);
   };
 
   int opt;
-  int width = 80, height = 20, tab = 8;
+  int width = 74, height = 26, tab = 8;
   while ((opt = getopt(argc, argv, "w:h:t:")) != -1) {
     switch (opt) {
     case 'w': width = atoi(optarg); break;
