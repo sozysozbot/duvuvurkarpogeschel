@@ -37,6 +37,7 @@
 #include "terminal.hpp"
 #include "fat.hpp"
 #include "syscall.hpp"
+#include "osbanner.h"
 
 int printk(const char* format, ...) {
   va_list ap;
@@ -139,13 +140,17 @@ extern "C" void KernelMainNewStack(
     auto margin_left = (physical_frame_buffer_config_ref.horizontal_resolution - FIXED_HORIZONTAL_RES) / 2;
     auto margin_top = (physical_frame_buffer_config_ref.vertical_resolution - FIXED_VERTICAL_RES) / 3;
 
-    auto branding_logo_width = 80;
-    for (int y = FIXED_VERTICAL_RES + margin_top; y < physical_frame_buffer_config_ref.vertical_resolution; ++y) {
-      int x_center = FIXED_HORIZONTAL_RES / 2 + margin_left; 
-      int x_start = x_center - branding_logo_width / 2;
-      int x_end = x_center + branding_logo_width / 2;
-      for (int x = x_start; x < x_end; ++x) {
-        PrimitivelyWritePixel(physical_frame_buffer_config_ref, x, y, {38, 65, 103});
+    auto branding_logo_width = osbanner.width;
+    auto branding_logo_height = osbanner.height;
+
+    auto y_start = FIXED_VERTICAL_RES + margin_top;
+    auto y_end = std::min(y_start + branding_logo_height, physical_frame_buffer_config_ref.vertical_resolution);
+    int x_center = FIXED_HORIZONTAL_RES / 2 + margin_left; 
+    int x_start = x_center - branding_logo_width / 2;
+    for (int y = y_start; y < y_end; ++y) {
+      for (int x = x_start; x < x_start + branding_logo_width; ++x) {
+        const uint8_t *p = &osbanner.pixel_data[(osbanner.width * (y - y_start) + (x - x_start)) * osbanner.bytes_per_pixel];
+        PrimitivelyWritePixel(physical_frame_buffer_config_ref, x, y, {p[0], p[1], p[2]});
       }
     }
 
