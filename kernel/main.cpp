@@ -119,7 +119,53 @@ void InputTextWindow(char c) {
 
 alignas(16) uint8_t kernel_main_stack[1024 * 1024];
 
+/** 本当は画面縦幅は horizontal_resolution、画面横幅は vertical_resolution なのだが、
+ *  768 x 543 の固定幅の画面をエミュレートする。
+ *  ただし、それはそれとして枠外に固定のバナーは描きたい。
+ *  バナーは一度描画したら上書きされることはないので、ここで描画しておく。
+ */
+FrameBufferConfig DrawBannerAndShrinkScreenTo768x543(const FrameBufferConfig& old_config) {
+  const uint32_t FIXED_HORIZONTAL_RES = 768;
+  const uint32_t FIXED_VERTICAL_RES = 543;
+  assert(old_config.horizontal_resolution >= FIXED_HORIZONTAL_RES);
+  assert(old_config.vertical_resolution >= FIXED_VERTICAL_RES);
 
+  // I want `margin_left` to be equal to `margin_right`
+  auto margin_left = (old_config.horizontal_resolution - FIXED_HORIZONTAL_RES) / 2;
+
+  // I want `margin_bottom` to be twice the size of `margin_top`
+  auto margin_top = (old_config.vertical_resolution - FIXED_VERTICAL_RES) / 3;
+
+  // I intend to show the banner within the bottom margin.
+  auto y_start = FIXED_VERTICAL_RES + margin_top;
+
+  // std::min is used to account for the case where the banner's height is too large.
+  auto y_end = std::min(y_start + osbanner.height, old_config.vertical_resolution);
+  int x_center = FIXED_HORIZONTAL_RES / 2 + margin_left; 
+
+  int x_left = x_center - osbanner.width / 2;
+  int x_right = x_left + osbanner.width;
+  int x_start = std::max(x_left, 0);
+  int x_end = std::min(x_right, static_cast<int>(old_config.horizontal_resolution));
+
+  for (int y = y_start; y < y_end; ++y) {
+    for (int x = x_start; x < x_end; ++x) {
+      const uint8_t *p = &osbanner.pixel_data[(osbanner.width * (y - y_start) + (x - x_left)) * osbanner.bytes_per_pixel];
+      PrimitivelyWritePixel(old_config, x, y, {p[0], p[1], p[2]});
+    }
+  }
+
+  FrameBufferConfig new_config = {
+    old_config.frame_buffer 
+      + BytesPerPixel(old_config.pixel_format) * (old_config.pixels_per_scan_line * margin_top + margin_left),
+    old_config.pixels_per_scan_line,
+    FIXED_HORIZONTAL_RES,
+    FIXED_VERTICAL_RES,
+    old_config.pixel_format
+  };
+    
+  return new_config;
+}
 
 extern "C" void KernelMainNewStack(
     const FrameBufferConfig& physical_frame_buffer_config_ref,
@@ -127,43 +173,8 @@ extern "C" void KernelMainNewStack(
     const acpi::RSDP& acpi_table,
     void* volume_image) {
   MemoryMap memory_map{memory_map_ref};
-
-  // 本当は画面縦幅は horizontal_resolution、画面横幅は vertical_resolution なのだが、
-  // 768 x 543 の固定幅の画面をエミュレートする。
-  // ただし、それはそれとして枠外に固定の模様は描きたい。こいつは一度書いたら書き換えることはない。
-  {
-    const uint32_t FIXED_HORIZONTAL_RES = 768;
-    const uint32_t FIXED_VERTICAL_RES = 543;
-    assert(physical_frame_buffer_config_ref.horizontal_resolution >= FIXED_HORIZONTAL_RES);
-    assert(physical_frame_buffer_config_ref.vertical_resolution >= FIXED_VERTICAL_RES);
-
-    auto margin_left = (physical_frame_buffer_config_ref.horizontal_resolution - FIXED_HORIZONTAL_RES) / 2;
-    auto margin_top = (physical_frame_buffer_config_ref.vertical_resolution - FIXED_VERTICAL_RES) / 3;
-
-    auto branding_logo_width = osbanner.width;
-    auto branding_logo_height = osbanner.height;
-
-    auto y_start = FIXED_VERTICAL_RES + margin_top;
-    auto y_end = std::min(y_start + branding_logo_height, physical_frame_buffer_config_ref.vertical_resolution);
-    int x_center = FIXED_HORIZONTAL_RES / 2 + margin_left; 
-    int x_start = x_center - branding_logo_width / 2;
-    for (int y = y_start; y < y_end; ++y) {
-      for (int x = x_start; x < x_start + branding_logo_width; ++x) {
-        const uint8_t *p = &osbanner.pixel_data[(osbanner.width * (y - y_start) + (x - x_start)) * osbanner.bytes_per_pixel];
-        PrimitivelyWritePixel(physical_frame_buffer_config_ref, x, y, {p[0], p[1], p[2]});
-      }
-    }
-
-    FrameBufferConfig virtual_frame_buffer_config = {
-      physical_frame_buffer_config_ref.frame_buffer 
-        + BytesPerPixel(physical_frame_buffer_config_ref.pixel_format) * (physical_frame_buffer_config_ref.pixels_per_scan_line * margin_top + margin_left),
-      physical_frame_buffer_config_ref.pixels_per_scan_line,
-      FIXED_HORIZONTAL_RES,
-      FIXED_VERTICAL_RES,
-      physical_frame_buffer_config_ref.pixel_format
-    };
-    InitializeGraphics(virtual_frame_buffer_config);
-  }
+  const FrameBufferConfig shrunk_frame_buffer_config = DrawBannerAndShrinkScreenTo768x543(physical_frame_buffer_config_ref);
+  InitializeGraphics(shrunk_frame_buffer_config);
   InitializeConsole();
 
   printk("xux el duvuvurkarpogeschel!\n");
