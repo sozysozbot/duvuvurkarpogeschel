@@ -42,12 +42,8 @@ void FillRectangle(PixelWriter& writer, const Vector2D<int>& pos,
 }
 
 void DrawDesktop(PixelWriter& writer) {
-  const auto width = writer.Width();
-  const auto height = writer.Height();
-  FillRectangle(writer,
-                {0, 0},
-                {width, height},
-                {38, 65, 103});
+  // const auto width = writer.Width();
+  // const auto height = writer.Height();
   FillRectangle(writer,
                 {0, 0},
                 {768, 543},
@@ -96,5 +92,4 @@ void InitializeGraphics(const FrameBufferConfig& screen_config) {
       exit(1);
   }
 
-  DrawDesktop(*screen_writer);
 }
