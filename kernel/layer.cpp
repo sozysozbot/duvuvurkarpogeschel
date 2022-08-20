@@ -260,7 +260,11 @@ void InitializeLayer() {
   auto bgwindow = std::make_shared<Window>(
       screen_size.x, screen_size.y, screen_config.pixel_format);
 
-  FillRectangle(*bgwindow->Writer(), {0, 0}, {screen_size.x, screen_size.y}, {38, 65, 103});
+  for (int dy = 0; dy < screen_size.y; ++dy) {
+    for (int dx = 0; dx < screen_size.x; ++dx) {
+      (*bgwindow->Writer()).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
+    }
+  }
   DrawDesktop(*bgwindow->Writer());
 
   auto console_window = std::make_shared<Window>(
