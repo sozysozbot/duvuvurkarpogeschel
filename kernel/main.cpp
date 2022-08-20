@@ -119,13 +119,32 @@ void InputTextWindow(char c) {
 alignas(16) uint8_t kernel_main_stack[1024 * 1024];
 
 extern "C" void KernelMainNewStack(
-    const FrameBufferConfig& frame_buffer_config_ref,
+    const FrameBufferConfig& physical_frame_buffer_config_ref,
     const MemoryMap& memory_map_ref,
     const acpi::RSDP& acpi_table,
     void* volume_image) {
   MemoryMap memory_map{memory_map_ref};
 
-  InitializeGraphics(frame_buffer_config_ref);
+  assert(physical_frame_buffer_config_ref.horizontal_resolution >= 768);
+  assert(physical_frame_buffer_config_ref.vertical_resolution >= 543);
+
+  FrameBufferConfig virtual_frame_buffer_config = {
+    physical_frame_buffer_config_ref.frame_buffer,
+    physical_frame_buffer_config_ref.pixels_per_scan_line,
+    768,
+    543,
+    physical_frame_buffer_config_ref.pixel_format
+  };
+
+  /*
+  for (int dy = 0; dy < screen_size.y; ++dy) {
+    for (int dx = 0; dx < screen_size.x; ++dx) {
+      (*bgwindow).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
+    }
+  }
+  */
+
+  InitializeGraphics(virtual_frame_buffer_config);
   InitializeConsole();
 
   printk("xux el duvuvurkarpogeschel!\n");
