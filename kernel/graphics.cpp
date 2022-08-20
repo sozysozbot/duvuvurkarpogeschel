@@ -46,9 +46,13 @@ void DrawDesktop(PixelWriter& writer) {
   const auto height = writer.Height();
   FillRectangle(writer,
                 {0, 0},
-                {width, height - 50},
-                kDesktopBGColor);
+                {width, height},
+                {38, 65, 103});
   FillRectangle(writer,
+                {0, 0},
+                {768, 543},
+                kDesktopBGColor);
+ /* FillRectangle(writer,
                 {0, height - 50},
                 {width, 50},
                 {1, 8, 17});
@@ -59,7 +63,7 @@ void DrawDesktop(PixelWriter& writer) {
   DrawRectangle(writer,
                 {10, height - 40},
                 {30, 30},
-                {160, 160, 160});
+                {160, 160, 160}); */
 }
 
 FrameBufferConfig screen_config;
