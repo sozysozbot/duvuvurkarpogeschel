@@ -136,17 +136,18 @@ extern "C" void KernelMainNewStack(
     assert(physical_frame_buffer_config_ref.horizontal_resolution >= FIXED_HORIZONTAL_RES);
     assert(physical_frame_buffer_config_ref.vertical_resolution >= FIXED_VERTICAL_RES);
 
-    
-    /*
-    for (int dy = 0; dy < screen_size.y; ++dy) {
-      for (int dx = 0; dx < screen_size.x; ++dx) {
-        (*bgwindow).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
-      }
-    }
-    */
-
     auto margin_left = (physical_frame_buffer_config_ref.horizontal_resolution - FIXED_HORIZONTAL_RES) / 2;
     auto margin_top = (physical_frame_buffer_config_ref.vertical_resolution - FIXED_VERTICAL_RES) / 3;
+
+    auto branding_logo_width = 80;
+    for (int y = FIXED_VERTICAL_RES + margin_top; y < physical_frame_buffer_config_ref.vertical_resolution; ++y) {
+      int x_center = FIXED_HORIZONTAL_RES / 2 + margin_left; 
+      int x_start = x_center - branding_logo_width / 2;
+      int x_end = x_center + branding_logo_width / 2;
+      for (int x = x_start; x < x_end; ++x) {
+        PrimitivelyWritePixel(physical_frame_buffer_config_ref, x, y, {38, 65, 103});
+      }
+    }
 
     FrameBufferConfig virtual_frame_buffer_config = {
       physical_frame_buffer_config_ref.frame_buffer 
