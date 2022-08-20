@@ -262,7 +262,7 @@ void InitializeLayer() {
 
   for (int dy = 0; dy < screen_size.y; ++dy) {
     for (int dx = 0; dx < screen_size.x; ++dx) {
-      (*bgwindow->Writer()).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
+      (*bgwindow).Write(Vector2D<int>{dx, dy}, {38, 65, 103});
     }
   }
   DrawDesktop(*bgwindow->Writer());
