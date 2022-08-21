@@ -259,6 +259,7 @@ void InitializeLayer() {
 
   auto bgwindow = std::make_shared<Window>(
       screen_size.x, screen_size.y, screen_config.pixel_format);
+
   DrawDesktop(*bgwindow->Writer());
 
   auto console_window = std::make_shared<Window>(

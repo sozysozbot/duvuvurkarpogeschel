@@ -20,6 +20,23 @@ void BGRResv8BitPerColorPixelWriter::Write(Vector2D<int> pos, const PixelColor& 
   p[2] = c.r;
 }
 
+int PrimitivelyWritePixel(const FrameBufferConfig& config, int x, int y, const PixelColor& c) {
+  const int pixel_position = config.pixels_per_scan_line * y + x;
+  uint8_t* p = &config.frame_buffer[4 * pixel_position];
+  if (config.pixel_format == kPixelRGBResv8BitPerColor) {
+    p[0] = c.r;
+    p[1] = c.g;
+    p[2] = c.b;
+  } else if (config.pixel_format == kPixelBGRResv8BitPerColor) {
+    p[0] = c.b;
+    p[1] = c.g;
+    p[2] = c.r;
+  } else {
+    return -1;
+  }
+  return 0;
+}
+
 void DrawRectangle(PixelWriter& writer, const Vector2D<int>& pos,
                    const Vector2D<int>& size, const PixelColor& c) {
   for (int dx = 0; dx < size.x; ++dx) {
@@ -44,11 +61,8 @@ void FillRectangle(PixelWriter& writer, const Vector2D<int>& pos,
 void DrawDesktop(PixelWriter& writer) {
   const auto width = writer.Width();
   const auto height = writer.Height();
-  FillRectangle(writer,
-                {0, 0},
-                {width, height - 50},
-                kDesktopBGColor);
-  FillRectangle(writer,
+  FillRectangle(writer, {0, 0}, {width, height}, kDesktopBGColor);
+ /* FillRectangle(writer,
                 {0, height - 50},
                 {width, 50},
                 {1, 8, 17});
@@ -59,7 +73,7 @@ void DrawDesktop(PixelWriter& writer) {
   DrawRectangle(writer,
                 {10, height - 40},
                 {30, 30},
-                {160, 160, 160});
+                {160, 160, 160}); */
 }
 
 FrameBufferConfig screen_config;
@@ -92,5 +106,4 @@ void InitializeGraphics(const FrameBufferConfig& screen_config) {
       exit(1);
   }
 
-  DrawDesktop(*screen_writer);
 }
