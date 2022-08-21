@@ -6,6 +6,10 @@ extern "C" {
 #else
 #include <stddef.h>
 #include <stdint.h>
+
+// #include <uchar.h>
+// uchar.h somehow did not exist in this environment.
+#define char32_t uint_least32_t
 #endif
 
 #include "../kernel/logger.hpp"
