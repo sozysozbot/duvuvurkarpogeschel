@@ -12,6 +12,7 @@
 #include "task.hpp"
 #include "terminal.hpp"
 #include "font.hpp"
+#include "fontpktk.hpp"
 #include "timer.hpp"
 #include "keyboard.hpp"
 #include "app_event.hpp"
@@ -399,13 +400,22 @@ SYSCALL(IsHalfwidth) {
   return { IsHankaku(arg1), 0 };
 }
 
+SYSCALL(WinWriteStringInPektak) {
+  return DoWinFunc(
+      [](Window& win,
+         int x, int y, uint32_t color, const char* s) {
+        WriteStringInPektak(*win.Writer(), {x, y}, s, ToColor(color));
+        return Result{ 0, 0 };
+      }, arg1, arg2, arg3, arg4, reinterpret_cast<const char*>(arg5));
+}
+
 #undef SYSCALL
 
 } // namespace syscall
 
 using SyscallFuncType = syscall::Result (uint64_t, uint64_t, uint64_t,
                                          uint64_t, uint64_t, uint64_t);
-extern "C" std::array<SyscallFuncType*, 0x11> syscall_table{
+extern "C" std::array<SyscallFuncType*, 0x12> syscall_table{
   /* 0x00 */ syscall::LogString,
   /* 0x01 */ syscall::PutString,
   /* 0x02 */ syscall::Exit,
@@ -423,6 +433,7 @@ extern "C" std::array<SyscallFuncType*, 0x11> syscall_table{
   /* 0x0e */ syscall::DemandPages,
   /* 0x0f */ syscall::MapFile,
   /* 0x10 */ syscall::IsHalfwidth,
+  /* 0x11 */ syscall::WinWriteStringInPektak,
 };
 
 void InitializeSyscall() {

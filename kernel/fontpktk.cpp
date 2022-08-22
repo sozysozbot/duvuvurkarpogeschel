@@ -37,7 +37,7 @@ void WriteStringInPektak(PixelWriter& writer, Vector2D<int> pos, const char* s, 
   int x = 0;
   while (*s) {
     const auto [ u32, bytes ] = ConvertUTF8To32(s);
-    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
+    WriteUnicodeCharInPektak(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
     s += bytes;
     x += IsHankaku(u32) ? 1 : 2;
   }

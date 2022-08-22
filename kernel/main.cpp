@@ -18,6 +18,7 @@
 #include "graphics.hpp"
 #include "mouse.hpp"
 #include "font.hpp"
+#include "fontpktk.hpp"
 #include "console.hpp"
 #include "pci.hpp"
 #include "logger.hpp"
@@ -189,6 +190,7 @@ extern "C" void KernelMainNewStack(
 
   fat::Initialize(volume_image);
   InitializeFont();
+  InitializePektakFont();
   InitializePCI();
 
   InitializeLayer();
