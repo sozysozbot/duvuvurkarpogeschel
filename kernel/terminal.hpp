@@ -38,7 +38,7 @@ class Terminal {
   Terminal(Task& task, const TerminalDescriptor* term_desc);
   unsigned int LayerID() const { return layer_id_; }
   Rectangle<int> BlinkCursor();
-  Rectangle<int> InputKey(uint8_t modifier, uint8_t keycode, char ascii);
+  Rectangle<int> InputKey(uint8_t modifier, uint8_t keycode, char32_t unicode);
 
   void Print(const char* s, std::optional<size_t> len = std::nullopt);
 

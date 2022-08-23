@@ -329,12 +329,12 @@ Vector2D<int> Terminal::CalcCursorPos() const {
 }
 
 Rectangle<int> Terminal::InputKey(
-    uint8_t modifier, uint8_t keycode, char ascii) {
+    uint8_t modifier, uint8_t keycode, char32_t unicode) {
   DrawCursor(false);
 
   Rectangle<int> draw_area{CalcCursorPos(), {8*2, 16}};
 
-  if (ascii == '\n') {
+  if (unicode == '\n') {
     linebuf_[linebuf_index_] = 0;
     if (linebuf_index_ > 0) {
       cmd_history_.pop_back();
@@ -353,7 +353,7 @@ Rectangle<int> Terminal::InputKey(
     Print(">");
     draw_area.pos = ToplevelWindow::kTopLeftMargin;
     draw_area.size = window_->InnerSize();
-  } else if (ascii == '\b') {
+  } else if (unicode == '\b') {
     if (cursor_.x > 0) {
       --cursor_.x;
       if (show_window_) {
@@ -365,12 +365,13 @@ Rectangle<int> Terminal::InputKey(
         --linebuf_index_;
       }
     }
-  } else if (ascii != 0) {
+  } else if (unicode != 0) {
     if (cursor_.x < kColumns - 1 && linebuf_index_ < kLineMax - 1) {
-      linebuf_[linebuf_index_] = ascii;
+      linebuf_[linebuf_index_] = unicode;
+      // TODO: this fails when we allow a fullwidth character from the keyboard
       ++linebuf_index_;
       if (show_window_) {
-        WriteAscii(*window_->Writer(), CalcCursorPos(), ascii, {255, 255, 255});
+        WriteUnicodeChar(*window_->Writer(), CalcCursorPos(), unicode, {255, 255, 255});
       }
       ++cursor_.x;
     }
@@ -817,7 +818,7 @@ void TaskTerminal(uint64_t task_id, int64_t data) {
       if (msg->arg.keyboard.press) {
         const auto area = terminal->InputKey(msg->arg.keyboard.modifier,
                                              msg->arg.keyboard.keycode,
-                                             msg->arg.keyboard.ascii);
+                                             msg->arg.keyboard.unicode);
         if (show_window) {
           Message msg = MakeLayerMessage(
               task_id, terminal->LayerID(), LayerOperation::DrawArea, area);
@@ -845,6 +846,29 @@ TerminalFileDescriptor::TerminalFileDescriptor(Terminal& term)
     : term_{term} {
 }
 
+int ConvertUTF32toUTF8(char32_t c, char *bufc) {
+  if (c <= 0x7f) {
+    bufc[0] = static_cast<char>(c);
+    return 1;
+  } else if (c <= 0x07ff) {
+    bufc[0] = 0xC0 | static_cast<char>(c >> 6);
+    bufc[1] = 0x80 | (static_cast<char>(c) & 0x3F);
+    return 2;
+  } else if (c <= 0xffff) {
+    bufc[0] = 0xE0 | static_cast<char>(c >> 12);
+    bufc[1] = 0x80 | (static_cast<char>(c >> 6) & 0x3F);
+    bufc[2] = 0x80 | (static_cast<char>(c) & 0x3F);
+    return 3;
+  } else {
+    bufc[0] = 0xF0 | static_cast<char>(c >> 18);
+    bufc[1] = 0x80 | (static_cast<char>(c >> 12) & 0x3F);
+    bufc[2] = 0x80 | (static_cast<char>(c >> 6) & 0x3F);
+    bufc[3] = 0x80 | (static_cast<char>(c) & 0x3F);
+    return 4;
+  }
+  return 0;
+}
+
 size_t TerminalFileDescriptor::Read(void* buf, size_t len) {
   char* bufc = reinterpret_cast<char*>(buf);
 
@@ -861,17 +885,19 @@ size_t TerminalFileDescriptor::Read(void* buf, size_t len) {
       continue;
     }
     if (msg->arg.keyboard.modifier & (kLControlBitMask | kRControlBitMask)) {
+      #if 0
       char s[3] = "^ ";
       s[1] = toupper(msg->arg.keyboard.ascii);
       term_.Print(s);
       if (msg->arg.keyboard.keycode == 7 /* D */) {
         return 0; // EOT
       }
+      #endif
       continue;
     }
 
-    bufc[0] = msg->arg.keyboard.ascii;
-    term_.Print(bufc, 1);
+    int len = ConvertUTF32toUTF8(msg->arg.keyboard.unicode, bufc);
+    term_.Print(bufc, len);
     term_.Redraw();
     return 1;
   }

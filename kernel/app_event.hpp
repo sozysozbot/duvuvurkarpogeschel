@@ -2,6 +2,13 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#include <stddef.h>
+#include <stdint.h>
+
+// #include <uchar.h>
+// uchar.h somehow did not exist in this environment.
+#define char32_t uint_least32_t
 #endif
 
 struct AppEvent {
@@ -34,7 +41,7 @@ struct AppEvent {
     struct {
       uint8_t modifier;
       uint8_t keycode;
-      char ascii;
+      char32_t unicode;
       int press; // 1: press, 0: release
     } keypush;
   } arg;

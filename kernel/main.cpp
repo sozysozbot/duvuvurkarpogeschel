@@ -71,7 +71,7 @@ void InitializeMainWindow() {
 std::shared_ptr<ToplevelWindow> text_window;
 unsigned int text_window_layer_id;
 void InitializeTextWindow() {
-  const int win_w = 160;
+  const int win_w = 168;
   const int win_h = 52;
 
   text_window = std::make_shared<ToplevelWindow>(
@@ -95,22 +95,23 @@ void DrawTextCursor(bool visible) {
   FillRectangle(*text_window->InnerWriter(), pos, {7, 15}, color);
 }
 
-void InputTextWindow(char c) {
-  if (c == 0) {
+void InputTextWindow(char32_t unicode) {
+  if (unicode == 0) {
     return;
   }
 
   auto pos = []() { return Vector2D<int>{4 + 8*text_window_index, 6}; };
 
   const int max_chars = (text_window->InnerSize().x - 8) / 8 - 1;
-  if (c == '\b' && text_window_index > 0) {
+  if (unicode == U'\b' && text_window_index > 0) {
     DrawTextCursor(false);
     --text_window_index;
     FillRectangle(*text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
     DrawTextCursor(true);
-  } else if (c >= ' ' && text_window_index < max_chars) {
+  } else if (unicode >= ' ' && text_window_index < max_chars) {
     DrawTextCursor(false);
-    WriteAscii(*text_window->InnerWriter(), pos(), c, ToColor(0));
+    // TODO: This should fail once we allow inputting a fullwidth character from the keyboard
+    WriteUnicodeChar(*text_window->InnerWriter(), pos(), unicode, ToColor(0));
     ++text_window_index;
     DrawTextCursor(true);
   }
@@ -260,7 +261,7 @@ extern "C" void KernelMainNewStack(
     case Message::kKeyPush:
       if (auto act = active_layer->GetActive(); act == text_window_layer_id) {
         if (msg->arg.keyboard.press) {
-          InputTextWindow(msg->arg.keyboard.ascii);
+          InputTextWindow(msg->arg.keyboard.unicode);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {
@@ -276,9 +277,9 @@ extern "C" void KernelMainNewStack(
           task_manager->SendMessage(task_it->second, *msg);
           __asm__("sti");
         } else {
-          printk("slahurfaeso veles niv ferleso. lysolarakrapt m'es %d, es %d fal ackir.\n",
+          printk("slahurfaeso veles niv ferleso. lysolarakrapt m'es %d, lyjotrakrapt es %d.\n",
               msg->arg.keyboard.keycode,
-              msg->arg.keyboard.ascii);
+              msg->arg.keyboard.unicode);
         }
       }
       break;
