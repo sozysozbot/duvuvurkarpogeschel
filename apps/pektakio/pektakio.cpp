@@ -190,11 +190,13 @@ void CopyUTF8String(char* dst, size_t dst_size,
 }
 
 int font_height = 24;
+int width_in_pixel = 592;
 
 void DrawLines(const LinesType& lines, int start_line,
                uint64_t layer_id, int width_in_pixel, int height_in_pixel, int tab) {
   char buf[1024];
   SyscallWinFillRectangle(layer_id, margin_left, margin_top, width_in_pixel, height_in_pixel, 0xffffff);
+  int padding_left = width_in_pixel / 8;
 
   for (int i = 0; i * font_height < height_in_pixel; ++i) {
     int line_index = start_line + i;
@@ -206,10 +208,10 @@ void DrawLines(const LinesType& lines, int start_line,
     auto line_len = l.line_len;
     bool underlined = l.is_underlined;
     CopyUTF8String(buf, sizeof(buf), line, line_len, /*w,*/ tab);
-    SyscallResult res = SyscallWinWriteStringInPektak(layer_id, margin_left, margin_top + font_height * i, 0x000000, buf, font_height);
+    SyscallResult res = SyscallWinWriteStringInPektak(layer_id, margin_left + padding_left, margin_top + font_height * i, 0x000000, buf, font_height);
     auto resulting_width = res.value;
     if (underlined) {
-      SyscallWinFillRectangle(layer_id, margin_left, margin_top + font_height * (i + 0.92), resulting_width, 2, 0x000000);
+      SyscallWinFillRectangle(layer_id, margin_left + padding_left, margin_top + font_height * (i + 0.92), resulting_width, 2, 0x000000);
     }
   }
 }
@@ -274,7 +276,7 @@ extern "C" void main(int argc, char** argv) {
   };
 
   int opt;
-  int width_in_pixel = 592, height_in_pixel = 416, tab = 8;
+  int height_in_pixel = 416, tab = 8;
   while ((opt = getopt(argc, argv, "w:h:t:")) != -1) {
     switch (opt) {
     case 'w': width_in_pixel = atoi(optarg); break;
