@@ -26,8 +26,11 @@ std::tuple<int, char*, size_t> MapFile(const char* filepath) {
   return {fd, reinterpret_cast<char*>(res.value), filesize};
 }
 
-uint64_t OpenTextWindow(int w, int h, const char* title) {
-  SyscallResult res = SyscallOpenWindow(8 + 8*w, 28 + 16*h, 10, 10, title);
+int margin_left = 4;
+int margin_top = 24;
+
+uint64_t OpenTextWindow(int width_in_pixel, int height_in_pixel, const char* title) {
+  SyscallResult res = SyscallOpenWindow(4 + margin_left + width_in_pixel, 4 + margin_top + height_in_pixel, 10, 10, title);
   if (res.error) {
     fprintf(stderr, "%s\n", strerror(res.error));
     exit(1);
@@ -37,10 +40,10 @@ uint64_t OpenTextWindow(int w, int h, const char* title) {
   auto fill_rect = [layer_id](int x, int y, int w, int h, uint32_t c) {
     SyscallWinFillRectangle(layer_id, x, y, w, h, c);
   };
-  fill_rect(3,       23,        1 + 8*w, 1,        0x666666);
-  fill_rect(3,       24,        1,       1 + 16*h, 0x666666);
-  fill_rect(4,       25 + 16*h, 1 + 8*w, 1,        0xcccccc);
-  fill_rect(5 + 8*w, 24,        1,       1 + 16*h, 0xcccccc);
+  fill_rect(3,                  23,                   1 + width_in_pixel, 1,                   0x666666);
+  fill_rect(3,                  24,                   1,                  1 + height_in_pixel, 0x666666);
+  fill_rect(4,                  25 + height_in_pixel, 1 + width_in_pixel, 1,                   0xcccccc);
+  fill_rect(5 + width_in_pixel, 24,                   1,                  1 + height_in_pixel, 0xcccccc);
 
   return layer_id;
 }
@@ -160,11 +163,10 @@ void CopyUTF8String(char* dst, size_t dst_size,
   *dst = '\0';
 }
 
+int font_height = 16; // looks fine, but fails when this becomes 24
+
 void DrawLines(const LinesType& lines, int start_line,
                uint64_t layer_id, int width_in_pixel, int height_in_pixel, int tab) {
-  int margin_left = 4;
-  int margin_top = 24;
-  int font_height = 16; // looks fine, but fails when this becomes 24
   char buf[1024];
   SyscallWinFillRectangle(layer_id, margin_left, margin_top, width_in_pixel, height_in_pixel, 0xffffff);
 
@@ -239,11 +241,11 @@ extern "C" void main(int argc, char** argv) {
   };
 
   int opt;
-  int width = 74, height = 26, tab = 8;
+  int width_in_pixel = 592, height_in_pixel = 416, tab = 8;
   while ((opt = getopt(argc, argv, "w:h:t:")) != -1) {
     switch (opt) {
-    case 'w': width = atoi(optarg); break;
-    case 'h': height = atoi(optarg); break;
+    case 'w': width_in_pixel = atoi(optarg); break;
+    case 'h': height_in_pixel = atoi(optarg); break;
     case 't': tab = atoi(optarg); break;
     default:
       print_help();
@@ -260,14 +262,14 @@ extern "C" void main(int argc, char** argv) {
 
   const char* last_slash = strrchr(filepath, '/');
   const char* filename = last_slash ? &last_slash[1] : filepath;
-  const auto layer_id = OpenTextWindow(width, height, filename);
+  const auto layer_id = OpenTextWindow(width_in_pixel, height_in_pixel, filename);
 
   const auto lines = FindLines(content, filesize);
 
   int start_line = 0;
   while (true) {
-    DrawLines(lines, start_line, layer_id, 74 * 8, 26 * 16, tab);
-    if (UpdateStartLine(&start_line, height, lines.size())) {
+    DrawLines(lines, start_line, layer_id, width_in_pixel, height_in_pixel, tab);
+    if (UpdateStartLine(&start_line, height_in_pixel / font_height, lines.size())) {
       break;
     }
   }
