@@ -7,6 +7,9 @@
 #include "fontpktk.hpp"
 #include "font.hpp"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <cstdlib>
 #include <vector>
 #include <bit>
@@ -194,7 +197,7 @@ Error WriteUnicodeCharInPektak(PixelWriter& writer, Vector2D<int> pos,
  * @returns 文字列の横幅（単位はピクセル） / the resulting width (in pixel) of the text
  * 
  */
-int WriteStringInPektak(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color, uint16_t font_height) {
+unsigned long WriteStringInPektak(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color, uint16_t font_height) {
   int x_in_pixel = 0;
   while (*s) {
     const auto [ u32, bytes ] = ConvertUTF8To32(s);

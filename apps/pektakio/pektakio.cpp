@@ -48,13 +48,29 @@ uint64_t OpenTextWindow(int width_in_pixel, int height_in_pixel, const char* tit
   return layer_id;
 }
 
-using LinesType = std::vector<std::pair<const char*, size_t>>;
+struct Line {
+  const char* line;
+  size_t line_len;
+  bool is_underlined;
+};
+
+using LinesType = std::vector<Line>;
 
 LinesType FindLines(const char* p, size_t len) {
   LinesType lines;
   const char* end = p + len;
+  bool is_underlined = false;
+  bool continue_underlined = false;
 
-  auto next_lf = [end](const char* s) {
+  auto next_lf = [end, &is_underlined, &continue_underlined](const char* s) {
+    // '#' at the beginning of a line should make the line into a header.
+    is_underlined = continue_underlined || *s == '#';
+    continue_underlined = false;
+
+    if (*s == '#') {
+      ++s;
+    }
+
     while (s < end && *s != '\n' && *s != '%') { 
       // In this document format, the percent sign is used to the "soft-return",
       // that is, "the automatic change of line due to reaching the end of the line"
@@ -62,17 +78,27 @@ LinesType FindLines(const char* p, size_t len) {
       // 「行末に達したときに自動で行われるような改行」を表す。
       ++s;
     }
-    return s;
+    if (*s == '%' && is_underlined) {
+      // soft return should not cancel the effect of #
+      continue_underlined = true;
+    }
+    return std::pair<const char*, bool>(s, is_underlined);
   };
 
-  const char* lf = next_lf(p);
+  auto [lf, underline] = next_lf(p);
   while (lf < end) {
-    lines.push_back({p, lf - p});
+    const char *q = *p == '#' ? p + 1 : p;
+    Line l = {q, static_cast<size_t>(lf - q), underline};
+    lines.push_back(l);
     p = lf + 1;
-    lf = next_lf(p);
+    auto [lf_, underline_] = next_lf(p);
+    lf = lf_; 
+    underline = underline_;
   }
   if (p < end) {
-    lines.push_back({p, end - p});
+    const char *q = *p == '#' ? p + 1 : p;
+    Line l = {q, static_cast<size_t>(end - q), underline};
+    lines.push_back(l);
   }
 
   return lines;
@@ -163,7 +189,7 @@ void CopyUTF8String(char* dst, size_t dst_size,
   *dst = '\0';
 }
 
-int font_height = 24; // looks fine, but fails when this becomes 24
+int font_height = 24;
 
 void DrawLines(const LinesType& lines, int start_line,
                uint64_t layer_id, int width_in_pixel, int height_in_pixel, int tab) {
@@ -175,9 +201,16 @@ void DrawLines(const LinesType& lines, int start_line,
     if (line_index < 0 || lines.size() <= line_index) {
       continue;
     }
-    const auto [ line, line_len ] = lines[line_index];
+    Line l = lines[line_index];
+    auto line = l.line;
+    auto line_len = l.line_len;
+    bool underlined = l.is_underlined;
     CopyUTF8String(buf, sizeof(buf), line, line_len, /*w,*/ tab);
-    SyscallWinWriteStringInPektak(layer_id, margin_left, margin_top + font_height * i, 0x000000, buf, font_height);
+    SyscallResult res = SyscallWinWriteStringInPektak(layer_id, margin_left, margin_top + font_height * i, 0x000000, buf, font_height);
+    auto resulting_width = res.value;
+    if (underlined) {
+      SyscallWinFillRectangle(layer_id, margin_left, margin_top + font_height * (i + 0.92), resulting_width, 2, 0x000000);
+    }
   }
 }
 
