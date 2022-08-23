@@ -62,6 +62,7 @@ APPS_DIR=cersvass RESOURCE_DIR=resource ALPHABET=latin ./build.sh run
 | selsurle | マウスでお絵かき | 
 | iska	   | OSをバグらせようと企む |
 | ekcanaxm | 逆ポーランド記法電卓 |
+| pektakio ailpanit | AIL PANIT LETI CETKAIK LETI KULANTE の冒頭をレンダリング |
 
 なお、現状、iska kr_sysital とすると OS が本当にバグります。
 これは MikanOS day30f のバグです。
