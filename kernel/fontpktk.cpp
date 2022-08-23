@@ -167,7 +167,8 @@ char32_t duvuv_to_pektak(char32_t duvuv) {
     case U'ｘ': return U'x';
     case U'ｙ': return U'y';
     case U'ｚ': return U'z';
-    default: return duvuv;
+    case U' ': return U' ';
+    default: return U'\'';
   }
 }
 
