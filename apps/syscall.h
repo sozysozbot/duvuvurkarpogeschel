@@ -49,7 +49,7 @@ struct SyscallResult SyscallDemandPages(size_t num_pages, int flags);
 struct SyscallResult SyscallMapFile(int fd, size_t* file_size, int flags);
 struct SyscallResult SyscallIsHalfwidth(char32_t c);
 struct SyscallResult SyscallWinWriteStringInPektak(
-    uint64_t layer_id_flags, int x, int y, uint32_t color, const char* s);
+    uint64_t layer_id_flags, int x, int y, uint32_t color, const char* s, uint16_t font_height);
 
 #ifdef __cplusplus
 } // extern "C"

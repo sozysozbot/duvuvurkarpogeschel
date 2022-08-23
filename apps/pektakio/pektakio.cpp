@@ -52,7 +52,11 @@ LinesType FindLines(const char* p, size_t len) {
   const char* end = p + len;
 
   auto next_lf = [end](const char* s) {
-    while (s < end && *s != '\n') {
+    while (s < end && *s != '\n' && *s != '%') { 
+      // In this document format, the percent sign is used to the "soft-return",
+      // that is, "the automatic change of line due to reaching the end of the line"
+      // この文書フォーマットでは、パーセント記号はソフトリターン、つまり
+      // 「行末に達したときに自動で行われるような改行」を表す。
       ++s;
     }
     return s;
@@ -119,7 +123,7 @@ std::pair<char32_t, int> ConvertUTF8To32(const char* u8) {
 
 void CopyUTF8String(char* dst, size_t dst_size,
                     const char* src, size_t src_size,
-                    int w, int tab) {
+                    /*int w,*/ int tab) {
   int x = 0;
 
   const auto src_end = src + src_size;
@@ -141,9 +145,9 @@ void CopyUTF8String(char* dst, size_t dst_size,
     SyscallResult is_halfwidth = SyscallIsHalfwidth(u32);
     x += is_halfwidth.value ? 1 : 2;
 
-    if (x > w) {
+    /*if (x > w) {
       break;
-    }
+    }*/
 
     if (src + bytes > src_end || dst + bytes >= dst_end) {
       break;
@@ -157,18 +161,21 @@ void CopyUTF8String(char* dst, size_t dst_size,
 }
 
 void DrawLines(const LinesType& lines, int start_line,
-               uint64_t layer_id, int w, int h, int tab) {
+               uint64_t layer_id, int width_in_pixel, int height_in_pixel, int tab) {
+  int margin_left = 4;
+  int margin_top = 24;
+  int font_height = 16; // looks fine, but fails when this becomes 24
   char buf[1024];
-  SyscallWinFillRectangle(layer_id, 4, 24, 8*w, 16*h, 0xffffff);
+  SyscallWinFillRectangle(layer_id, margin_left, margin_top, width_in_pixel, height_in_pixel, 0xffffff);
 
-  for (int i = 0; i < h; ++i) {
+  for (int i = 0; i * font_height < height_in_pixel; ++i) {
     int line_index = start_line + i;
     if (line_index < 0 || lines.size() <= line_index) {
       continue;
     }
     const auto [ line, line_len ] = lines[line_index];
-    CopyUTF8String(buf, sizeof(buf), line, line_len, w, tab);
-    SyscallWinWriteStringInPektak(layer_id, 4, 24 + 16*i, 0x000000, buf);
+    CopyUTF8String(buf, sizeof(buf), line, line_len, /*w,*/ tab);
+    SyscallWinWriteStringInPektak(layer_id, margin_left, margin_top + font_height * i, 0x000000, buf, font_height);
   }
 }
 
@@ -259,7 +266,7 @@ extern "C" void main(int argc, char** argv) {
 
   int start_line = 0;
   while (true) {
-    DrawLines(lines, start_line, layer_id, width, height, tab);
+    DrawLines(lines, start_line, layer_id, 74 * 8, 26 * 16, tab);
     if (UpdateStartLine(&start_line, height, lines.size())) {
       break;
     }

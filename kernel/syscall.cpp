@@ -403,10 +403,10 @@ SYSCALL(IsHalfwidth) {
 SYSCALL(WinWriteStringInPektak) {
   return DoWinFunc(
       [](Window& win,
-         int x, int y, uint32_t color, const char* s) {
-        WriteStringInPektak(*win.Writer(), {x, y}, s, ToColor(color));
+         int x, int y, uint32_t color, const char* s, uint16_t font_height) {
+        WriteStringInPektak(*win.Writer(), {x, y}, s, ToColor(color), font_height);
         return Result{ 0, 0 };
-      }, arg1, arg2, arg3, arg4, reinterpret_cast<const char*>(arg5));
+      }, arg1, arg2, arg3, arg4, reinterpret_cast<const char*>(arg5), arg6);
 }
 
 #undef SYSCALL

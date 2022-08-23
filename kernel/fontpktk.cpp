@@ -186,34 +186,43 @@ Error RenderUnicodePektak(char32_t duvuv, FT_Face face) {
 
 } // namespace
 
-void WriteStringInPektak(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color) {
-  int x = 0;
+Error WriteUnicodeCharInPektak(PixelWriter& writer, Vector2D<int> pos,
+                  char32_t c, const PixelColor& color, uint16_t font_height, uint16_t& horizontal_advance_ref);
+
+/**
+ * @returns 文字列の横幅（単位はピクセル） / the resulting width (in pixel) of the text
+ * 
+ */
+int WriteStringInPektak(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color, uint16_t font_height) {
+  int x_in_pixel = 0;
   while (*s) {
     const auto [ u32, bytes ] = ConvertUTF8To32(s);
-    WriteUnicodeCharInPektak(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
+    uint16_t horizontal_advance = font_height; // the horizontal advance defaults to a fullwidth character
+    WriteUnicodeCharInPektak(writer, pos + Vector2D<int>{x_in_pixel, 0}, u32, color, font_height, horizontal_advance);
     s += bytes;
-    x += IsHankaku(u32) ? 1 : 2;
+    x_in_pixel += horizontal_advance;
   }
+  return x_in_pixel;
 }
 
-WithError<FT_Face> NewFTFaceFromPektak() {
+WithError<FT_Face> NewFTFaceFromPektak(uint16_t font_height) {
   FT_Face face;
   if (int err = FT_New_Memory_Face(
         ft_library, pektak_buf->data(), pektak_buf->size(), 0, &face)) {
     return { face, MAKE_ERROR(Error::kFreeTypeError) };
   }
-  if (int err = FT_Set_Pixel_Sizes(face, 16, 16)) {
+  if (int err = FT_Set_Pixel_Sizes(face, font_height, font_height)) {
     return { face, MAKE_ERROR(Error::kFreeTypeError) };
   }
   return { face, MAKE_ERROR(Error::kSuccess) };
 }
 
 /**
- * 埋める領域は動的に決まるのよなぁ
+ * @param horizontal_advance 参照を受け取り、文字の横幅を返す
  */
 Error WriteUnicodeCharInPektak(PixelWriter& writer, Vector2D<int> pos,
-                  char32_t c, const PixelColor& color) {
-  auto [ face, err ] = NewFTFaceFromPektak();
+                  char32_t c, const PixelColor& color, uint16_t font_height, uint16_t& horizontal_advance_ref) {
+  auto [ face, err ] = NewFTFaceFromPektak(font_height);
   if (err) {
     return err;
   }
@@ -240,6 +249,7 @@ Error WriteUnicodeCharInPektak(PixelWriter& writer, Vector2D<int> pos,
     }
   }
 
+  horizontal_advance_ref = face->glyph->metrics.horiAdvance * face->size->metrics.x_ppem / face->units_per_EM;  
   FT_Done_Face(face);
   return MAKE_ERROR(Error::kSuccess);
 }
