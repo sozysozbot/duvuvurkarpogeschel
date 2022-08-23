@@ -163,7 +163,7 @@ void CopyUTF8String(char* dst, size_t dst_size,
   *dst = '\0';
 }
 
-int font_height = 16; // looks fine, but fails when this becomes 24
+int font_height = 24; // looks fine, but fails when this becomes 24
 
 void DrawLines(const LinesType& lines, int start_line,
                uint64_t layer_id, int width_in_pixel, int height_in_pixel, int tab) {

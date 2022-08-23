@@ -249,7 +249,7 @@ Error WriteUnicodeCharInPektak(PixelWriter& writer, Vector2D<int> pos,
     }
   }
 
-  horizontal_advance_ref = face->glyph->metrics.horiAdvance * face->size->metrics.x_ppem / face->units_per_EM;  
+  horizontal_advance_ref = face->glyph->advance.x >> 6;  
   FT_Done_Face(face);
   return MAKE_ERROR(Error::kSuccess);
 }
