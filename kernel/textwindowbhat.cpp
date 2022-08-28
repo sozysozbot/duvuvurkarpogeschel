@@ -101,6 +101,7 @@ void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
     DrawTextCursorBhat(true);
   } else if (unicode >= ' ' && text_window_bhat_index < max_chars) {
     DrawTextCursorBhat(false);
+    char32_t c = 0;
     for (int i = 0; i < sizeof keymap / sizeof *keymap; i++) {
       if (keymap[i].keycode == unicode) {
         // First modifier == Ctrl
@@ -109,22 +110,21 @@ void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
           if (isAltPressed(modifier)) {
             // Ignore when both modifiers are pressed
           } else {
-            WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), keymap[i].first_modifier, ToColor(0));
-            ++text_window_bhat_index;
-            break;
+            c = keymap[i].first_modifier;
           }
         } else {
           if (isAltPressed(modifier)) {
-            WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), keymap[i].second_modifier, ToColor(0));
-            ++text_window_bhat_index;
-            break;
+            c = keymap[i].second_modifier;
           } else {
-            WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), keymap[i].no_modifier, ToColor(0));
-            ++text_window_bhat_index;
-            break;
+            c = keymap[i].no_modifier;
           }
         } 
       }
+    }
+
+    if (c) {
+      WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), c, ToColor(0));
+      ++text_window_bhat_index;
     }
     DrawTextCursorBhat(true);
   }
