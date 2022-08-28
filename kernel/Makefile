@@ -1,6 +1,7 @@
 TARGET = kernel.elf
-OBJS = main.o textwindow.o graphics.o mouse.o font.o fontpktk.o hankaku.o zenkaku.o newlib_support.o osbanner.o console.o \
-       pci.o asmfunc.o libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
+OBJS = main.o textwindow.o textwindowbhat.o graphics.o mouse.o font.o fontpktk.o \
+       hankaku.o zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
+	   libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
        window.o layer.o timer.o frame_buffer.o acpi.o keyboard.o task.o terminal.o \
        fat.o syscall.o file.o \
        usb/memory.o usb/device.o usb/xhci/ring.o usb/xhci/trb.o usb/xhci/xhci.o \

@@ -40,6 +40,7 @@
 #include "syscall.hpp"
 #include "osbanner.h"
 #include "textwindow.hpp"
+#include "textwindowbhat.hpp"
 
 int printk(const char* format, ...) {
   va_list ap;
@@ -147,15 +148,24 @@ extern "C" void KernelMainNewStack(
   InitializeLayer();
   InitializeMainWindow();
   InitializeTextWindow();
+  InitializeTextWindowBhat();
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
   acpi::Initialize(acpi_table);
   InitializeLAPICTimer();
 
+  // pertinent to textwindow.cpp
   const int kTextboxCursorTimer = 1;
   const int kTimer05Sec = static_cast<int>(kTimerFreq * 0.5);
   timer_manager->AddTimer(Timer{kTimer05Sec, kTextboxCursorTimer, 1});
   bool textbox_cursor_visible = false;
+
+  // pertinent to textwindowbhat.cpp
+  const int kTextboxBhatCursorTimer = 2;
+  const int kTimer05SecBhat = static_cast<int>(kTimerFreq * 0.5);
+  timer_manager->AddTimer(Timer{kTimer05SecBhat, kTextboxBhatCursorTimer, 1});
+  bool textbox_bhat_cursor_visible = false;
+
 
   InitializeSyscall();
 
@@ -206,12 +216,25 @@ extern "C" void KernelMainNewStack(
         textbox_cursor_visible = !textbox_cursor_visible;
         DrawTextCursor(textbox_cursor_visible);
         layer_manager->Draw(text_window_layer_id);
+      } else if (msg->arg.timer.value == kTextboxBhatCursorTimer) {
+        __asm__("cli");
+        timer_manager->AddTimer(
+            Timer{msg->arg.timer.timeout + kTimer05SecBhat, kTextboxBhatCursorTimer, 1});
+        __asm__("sti");
+        textbox_bhat_cursor_visible = !textbox_bhat_cursor_visible;
+        DrawTextCursorBhat(textbox_bhat_cursor_visible);
+        layer_manager->Draw(text_window_bhat_layer_id);
       }
       break;
-    case Message::kKeyPush:
-      if (auto act = active_layer->GetActive(); act == text_window_layer_id) {
+    case Message::kKeyPush: {
+      auto act = active_layer->GetActive(); 
+      if (act == text_window_layer_id) {
         if (msg->arg.keyboard.press) {
           InputTextWindow(msg->arg.keyboard.unicode);
+        }
+      } else if (act == text_window_bhat_layer_id) {
+        if (msg->arg.keyboard.press) {
+          InputTextWindowBhat(msg->arg.keyboard.unicode);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {
@@ -233,6 +256,7 @@ extern "C" void KernelMainNewStack(
         }
       }
       break;
+    }
     case Message::kLayer:
       ProcessLayerMessage(*msg);
       __asm__("cli");

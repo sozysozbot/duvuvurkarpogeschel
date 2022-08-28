@@ -8,6 +8,7 @@
 #include "window.hpp"
 #include "layer.hpp"
 #include "terminal.hpp"
+#include "textwindow.hpp"
 #include "syscall.hpp"
 
 std::shared_ptr<ToplevelWindow> text_window;
