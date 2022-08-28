@@ -234,7 +234,7 @@ extern "C" void KernelMainNewStack(
         }
       } else if (act == text_window_bhat_layer_id) {
         if (msg->arg.keyboard.press) {
-          InputTextWindowBhat(msg->arg.keyboard.unicode);
+          InputTextWindowBhat(msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {
