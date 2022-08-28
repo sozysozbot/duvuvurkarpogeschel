@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <limits>
 #include <numeric>
+#include <vector>
 
 #include "font.hpp"
 #include "memory_manager.hpp"
@@ -87,6 +88,7 @@ bool isAltPressed(uint8_t modifier) {
 }
 
 void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
+  static std::vector<char32_t> content;
   if (unicode == 0) {
     return;
   }
@@ -98,6 +100,9 @@ void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
     DrawTextCursorBhat(false);
     --text_window_bhat_index;
     FillRectangle(*text_window_bhat->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
+    if (!content.empty()) {
+      content.pop_back();
+    }
     DrawTextCursorBhat(true);
   } else if (unicode >= ' ' && text_window_bhat_index < max_chars) {
     DrawTextCursorBhat(false);
@@ -123,7 +128,38 @@ void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
     }
 
     if (c) {
+      // When the previous character is a consonant, key "A" should give a halant (aumakátá rod).
+      // 直前が子音字であるなら、A キーはハラント（アウマカーター・ロード）を出さねばならない。
+      if (c == U'\u0905' && !content.empty()) {
+        switch (content.back()) {
+          case U'\u092a' /*p*/: case U'\u092b'/*ph*/: case U'\u092c' /*b*/:  
+          case U'\u092d'/*bh*/: case U'\u092e' /*m*/: case U'\u0938' /*c*/: 
+          case U'\u0937' /*ṣ*/: case U'\u095b' /*s*/: case U'\u0936' /*x*/: 
+          case U'\u091a' /*z*/: case U'\u0924' /*t*/: case U'\u091f' /*ṭ*/: 
+          case U'\u0926' /*d*/: case U'\u0921' /*ḍ*/: case U'\u0927'/*dh*/: 
+          case U'\u0928' /*n*/: case U'\u0923' /*ṇ*/: case U'\u0932' /*l*/: 
+          case U'\u0933' /*ḷ*/: case U'\u0930' /*r*/: case U'\u0915' /*k*/: 
+          case U'\u0916'/*kh*/: case U'\u0917' /*g*/: case U'\u095a'/*gh*/: 
+          case U'\u0959' /*h*/: case U'\u092f' /*j*/: case U'\u095f' /*y*/: 
+          case U'\u0935' /*w*/: 
+          c = U'\u094d' /*ъ*/;
+        }
+      }
+
+      // When the previous character is a question mark, the double quotation key should create a ligature
+      // 直前が疑問符である場合は、二重引用符はリガチャを生まなければならない。
+      if (c == U'\u201e' /*"*/ && !content.empty() && content.back() == U'\u2e2e'	/*?*/) {
+
+        // delete the previous question mark
+        --text_window_bhat_index;
+        FillRectangle(*text_window_bhat->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
+        content.pop_back();
+
+        c = U'\u2047'; /* the ligature of the question mark and the double quote */
+      }
+
       WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), c, ToColor(0));
+      content.push_back(c);
       ++text_window_bhat_index;
     }
     DrawTextCursorBhat(true);
