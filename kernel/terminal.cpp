@@ -416,19 +416,22 @@ const char* sniff_file_entry(fat::DirectoryEntry *file_entry) {
   return "";
 }
 
-#define EXECUTE(command) do{auto file_entry = FindCommand(command);\
-    if (!file_entry) {\
-      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s.\n", command);\
-      exit_code = 1;\
-    } else {\
-      auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);\
-      if (err) {\
-        PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());\
-        exit_code = -ec;\
-      } else {\
-        exit_code = ec;\
-      }\
-    } } while(0)
+int Terminal::ExecuteCommand(const char *command, char* first_arg) {
+  auto file_entry = FindCommand(command);
+  if (!file_entry) {
+    PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s.\n", command);
+    return 1;
+  } else {
+    auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);
+    if (err) {
+      PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());
+      return -ec;
+    } else {
+      return ec;
+    }
+  }
+  return 0;
+}
 
 void Terminal::ExecuteLine() {
   char* command = &linebuf_[0];
@@ -642,14 +645,14 @@ void Terminal::ExecuteLine() {
       } else {
         auto file_type = sniff_file_entry(file_entry);
         if (strcmp(file_type, "krantie") == 0) {
-          EXECUTE("lurfa_kr");
+          exit_code = Terminal::ExecuteCommand("lurfa_kr", first_arg);
         } else if (strcmp(file_type, "aklurpti'a") == 0) {
-          EXECUTE("xel_aklu");
+          exit_code = Terminal::ExecuteCommand("xel_aklu", first_arg);
         }
       }
     }
   } else if (command[0] != 0) {
-    EXECUTE(command);
+    exit_code = Terminal::ExecuteCommand(command, first_arg);
   }
 
   if (pipe_fd) {
