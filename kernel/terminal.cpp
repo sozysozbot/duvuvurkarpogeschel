@@ -554,6 +554,44 @@ void Terminal::ExecuteLine() {
       }
       DrawCursor(true);
     }
+  } else if (strcmp(command, "karse") == 0) {
+    std::shared_ptr<FileDescriptor> fd;
+    if (!first_arg || first_arg[0] == '\0') {
+      fd = files_[0];
+    } else {
+      auto [ file_entry, post_slash ] = fat::FindFile(first_arg);
+      if (!file_entry) {
+        PrintToFD(*files_[1], "cene niv mi jel chertif l'es %s\n", first_arg);
+        exit_code = 1;
+      } else if (file_entry->attr != fat::Attribute::kDirectory && post_slash) {
+        char name[13];
+        fat::FormatName(*file_entry, name);
+        PrintToFD(*files_[1], "%s es niv chesta.\n", name);
+        exit_code = 1;
+      } else {
+        fd = std::make_shared<fat::FileDescriptor>(*file_entry);
+         if (fd) {
+          char name[13];
+          fat::FormatName(*file_entry, name);
+          int n = strlen(name);
+          for (int i = 0; i < n; i++) {
+            name[i] = tolower(name[i]);
+          }
+          uint8_t u8buf[1024];
+          DrawCursor(false);
+          ReadBinary(*fd, u8buf, sizeof(u8buf));
+          uint8_t png_header[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+          uint8_t jpg_header[] = {0xFF, 0xD8, 0xFF};
+          if (memcmp(u8buf, png_header, sizeof png_header) == 0 || memcmp(u8buf, jpg_header, sizeof jpg_header) == 0) {
+            PrintToFD(*files_[1], "%s es aklurpti'a.\n", name);
+          } else {
+            PrintToFD(*files_[1], "%s es krantie.\n", name);
+          }
+          DrawCursor(true);
+        }
+      }
+    }
+   
   } else if (strcmp(command, "ksfnerfe") == 0) {
     auto term_desc = new TerminalDescriptor{
       first_arg, true, false, files_

@@ -30,6 +30,7 @@ const char *mels_ksf[][3] = {
   {"xel", "<chertif>", "krantie l'es chertif'i xel" },
   {"melfertal", "", "melfertalasti fon chertif"},
   {"melfertal", "<chesta>", "melfertalasti fon chertif z'en chesta'c"},
+  {"karse", "<chertif o chesta>", "fonti'avertz stefart fon chertif o chesta"},
   {"ys", "", "ksf io lex mol lyjot'i ys"}
 };
 
