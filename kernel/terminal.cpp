@@ -17,7 +17,7 @@
 
 namespace {
 
-WithError<int> MakeArgVector(char* command, char* first_arg,
+WithError<int> MakeArgVector(const char* command, char* first_arg,
     char** argv, int argv_len, char* argbuf, int argbuf_len) {
   int argc = 0;
   int argbuf_index = 0;
@@ -407,7 +407,7 @@ const char* sniff_file_entry(fat::DirectoryEntry *file_entry) {
     if (memcmp(u8buf, png_header, sizeof png_header) == 0 || memcmp(u8buf, jpg_header, sizeof jpg_header) == 0) {
       return "aklurpti'a";
     } else {
-      return "kranti'e";
+      return "krantie";
     }
   }
   return "";
@@ -612,15 +612,58 @@ void Terminal::ExecuteLine() {
     PrintToFD(*files_[1], "Phys total: %lu frames (%llu MiB)\n",
         p_stat.total_frames,
         p_stat.total_frames * kBytesPerFrame / 1024 / 1024);
+  } else if (strcmp(command, "lurfa") == 0) {
+    // テキストなら lurfa_kr を、画像なら xel_aklu を呼び出す
+    if (!first_arg || first_arg[0] == '\0') {
+      PrintToFD(*files_[2], "liusel: lurfa <chertif o chesta>\n");
+      exit_code = 1;
+    } else {
+      auto [ file_entry, post_slash ] = fat::FindFile(first_arg);
+      if (!file_entry) {
+        PrintToFD(*files_[1], "cene niv mi jel chertif l'es %s\n", first_arg);
+        exit_code = 1;
+      } else {
+        auto file_type = sniff_file_entry(file_entry);
+        if (strcmp(file_type, "krantie") == 0) {
+          auto executable = FindCommand("lurfa_kr");
+          if (!executable) {
+            PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s fua lurfavo %s\n", "lurfa_kr", first_arg);
+            exit_code = 1;
+          } else {
+            auto [ ec, err ] = ExecuteFile(*executable, "lurfa_kr", first_arg);
+            if (err) {
+              PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s\n", err.Name());
+              exit_code = -ec;
+            } else {
+              exit_code = ec;
+            }
+          }
+        } else if (strcmp(file_type, "aklurpti'a") == 0) {
+          auto executable = FindCommand("xel_aklu");
+          if (!executable) {
+            PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s fua lurfavo %s\n", "xel_aklu", first_arg);
+            exit_code = 1;
+          } else {
+            auto [ ec, err ] = ExecuteFile(*executable, "xel_aklu", first_arg);
+            if (err) {
+              PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());
+              exit_code = -ec;
+            } else {
+              exit_code = ec;
+            }
+          }
+        }
+      }
+    }
   } else if (command[0] != 0) {
     auto file_entry = FindCommand(command);
     if (!file_entry) {
-      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s\n", command);
+      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s.\n", command);
       exit_code = 1;
     } else {
       auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);
       if (err) {
-        PrintToFD(*files_[2], "failed to exec file: %s\n", err.Name());
+        PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());
         exit_code = -ec;
       } else {
         exit_code = ec;
@@ -645,7 +688,7 @@ void Terminal::ExecuteLine() {
 }
 
 WithError<int> Terminal::ExecuteFile(fat::DirectoryEntry& file_entry,
-                                     char* command, char* first_arg) {
+                                     const char* command, char* first_arg) {
   __asm__("cli");
   auto& task = task_manager->CurrentTask();
   __asm__("sti");
