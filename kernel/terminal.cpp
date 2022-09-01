@@ -397,6 +397,9 @@ void Terminal::Scroll1() {
 }
 
 const char* sniff_file_entry(fat::DirectoryEntry *file_entry) {
+  if (file_entry->attr == fat::Attribute::kDirectory) {
+    return "chesta";
+  }
   std::shared_ptr<FileDescriptor> fd;
   fd = std::make_shared<fat::FileDescriptor>(*file_entry);
   if (fd) {
@@ -412,6 +415,20 @@ const char* sniff_file_entry(fat::DirectoryEntry *file_entry) {
   }
   return "";
 }
+
+#define EXECUTE(command) do{auto file_entry = FindCommand(command);\
+    if (!file_entry) {\
+      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s.\n", command);\
+      exit_code = 1;\
+    } else {\
+      auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);\
+      if (err) {\
+        PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());\
+        exit_code = -ec;\
+      } else {\
+        exit_code = ec;\
+      }\
+    } } while(0)
 
 void Terminal::ExecuteLine() {
   char* command = &linebuf_[0];
@@ -625,50 +642,14 @@ void Terminal::ExecuteLine() {
       } else {
         auto file_type = sniff_file_entry(file_entry);
         if (strcmp(file_type, "krantie") == 0) {
-          auto executable = FindCommand("lurfa_kr");
-          if (!executable) {
-            PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s fua lurfavo %s\n", "lurfa_kr", first_arg);
-            exit_code = 1;
-          } else {
-            auto [ ec, err ] = ExecuteFile(*executable, "lurfa_kr", first_arg);
-            if (err) {
-              PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s\n", err.Name());
-              exit_code = -ec;
-            } else {
-              exit_code = ec;
-            }
-          }
+          EXECUTE("lurfa_kr");
         } else if (strcmp(file_type, "aklurpti'a") == 0) {
-          auto executable = FindCommand("xel_aklu");
-          if (!executable) {
-            PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s fua lurfavo %s\n", "xel_aklu", first_arg);
-            exit_code = 1;
-          } else {
-            auto [ ec, err ] = ExecuteFile(*executable, "xel_aklu", first_arg);
-            if (err) {
-              PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());
-              exit_code = -ec;
-            } else {
-              exit_code = ec;
-            }
-          }
+          EXECUTE("xel_aklu");
         }
       }
     }
   } else if (command[0] != 0) {
-    auto file_entry = FindCommand(command);
-    if (!file_entry) {
-      PrintToFD(*files_[2], "cene niv mi jel cersva l'es %s.\n", command);
-      exit_code = 1;
-    } else {
-      auto [ ec, err ] = ExecuteFile(*file_entry, command, first_arg);
-      if (err) {
-        PrintToFD(*files_[2], "mi nix fenxergo cersva itj %s.\n", err.Name());
-        exit_code = -ec;
-      } else {
-        exit_code = ec;
-      }
-    }
+    EXECUTE(command);
   }
 
   if (pipe_fd) {
