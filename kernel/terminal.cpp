@@ -571,13 +571,25 @@ void Terminal::ExecuteLine() {
       if (!file_entry) {
         PrintToFD(*files_[2], "cene niv mi jel chertif l'es %s\n", first_arg);
         exit_code = 1;
-      } else if (file_entry->attr != fat::Attribute::kDirectory && post_slash) {
-        char name[13];
-        fat::FormatName(*file_entry, name);
-        PrintToFD(*files_[2], "%s es niv chesta.\n", name);
-        exit_code = 1;
       } else {
-        fd = std::make_shared<fat::FileDescriptor>(*file_entry);
+        auto file_type = sniff_file_entry(file_entry);
+        if (strcmp(file_type, "krantie") == 0) {
+          if (file_entry->attr != fat::Attribute::kDirectory && post_slash) {
+            char name[13];
+            fat::FormatName(*file_entry, name);
+            PrintToFD(*files_[2], "%s es niv chesta.\n", name);
+            exit_code = 1;
+          } else {
+            fd = std::make_shared<fat::FileDescriptor>(*file_entry);
+          }
+        } else if (strcmp(file_type, "aklurpti'a") == 0) {
+          // todo; for now, ask the user to use lurfa
+          PrintToFD(*files_[2], "%s es aklurpti'a gelx shrlo fenxe \"lurfa %s\".\n", first_arg, first_arg);
+          exit_code = 1;
+        } else if (strcmp(file_type, "chesta") == 0) {
+          // melfertal
+          ListEntriesInLowercaseHidingDoubleUnderscore(*files_[1], file_entry->FirstCluster());
+        }
       }
     }
     if (fd) {
@@ -640,7 +652,7 @@ void Terminal::ExecuteLine() {
     } else {
       auto [ file_entry, post_slash ] = fat::FindFile(first_arg);
       if (!file_entry) {
-        PrintToFD(*files_[1], "cene niv mi jel chertif l'es %s\n", first_arg);
+        PrintToFD(*files_[2], "cene niv mi jel chertif l'es %s.\n", first_arg);
         exit_code = 1;
       } else {
         auto file_type = sniff_file_entry(file_entry);
@@ -648,6 +660,10 @@ void Terminal::ExecuteLine() {
           exit_code = Terminal::ExecuteCommand("lurfa_kr", first_arg);
         } else if (strcmp(file_type, "aklurpti'a") == 0) {
           exit_code = Terminal::ExecuteCommand("xel_aklu", first_arg);
+        } else if (strcmp(file_type, "chesta") == 0) {
+          // todo; for now, ask the user to use melfertal
+          PrintToFD(*files_[2], "%s es chesta gelx shrlo fenxe \"melfertal %s\".\n", first_arg, first_arg);
+          exit_code = 1;
         }
       }
     }
