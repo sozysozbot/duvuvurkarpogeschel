@@ -63,3 +63,13 @@ void CursoredTextBox::DrawTextCursor(bool visible) {
   const auto pos = Vector2D<int>{4 + 8*this->text_window_index, 5};
   FillRectangle(*this->text_window->InnerWriter(), pos, {7, 15}, color);
 }
+
+void CursoredTextBox::ManageCursor(std::optional<Message> msg) {
+  __asm__("cli");
+  timer_manager->AddTimer(
+      Timer{msg->arg.timer.timeout + this->kTimer, this->cursorTimer, 1});
+  __asm__("sti");
+  this->cursor_visible = !this->cursor_visible;
+  this->DrawTextCursor(this->cursor_visible);
+  layer_manager->Draw(this->text_window_layer_id);
+}

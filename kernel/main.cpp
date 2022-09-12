@@ -121,16 +121,6 @@ FrameBufferConfig DrawBannerAndShrinkScreenTo768x543(const FrameBufferConfig& ol
   return new_config;
 }
 
-void ManageCursor(CursoredTextBox &box, std::optional<Message> msg) {
-  __asm__("cli");
-  timer_manager->AddTimer(
-      Timer{msg->arg.timer.timeout + box.kTimer, box.cursorTimer, 1});
-  __asm__("sti");
-  box.cursor_visible = !box.cursor_visible;
-  box.DrawTextCursor(box.cursor_visible);
-  layer_manager->Draw(box.text_window_layer_id);
-}
-
 extern "C" void KernelMainNewStack(
     const FrameBufferConfig& physical_frame_buffer_config_ref,
     const MemoryMap& memory_map_ref,
@@ -217,9 +207,9 @@ extern "C" void KernelMainNewStack(
       break;
     case Message::kTimerTimeout:
       if (msg->arg.timer.value == normal_text_window.cursorTimer) {
-        ManageCursor(normal_text_window, msg);
+        normal_text_window.ManageCursor(msg);
       } else if (msg->arg.timer.value == bhat_text_window.cursorTimer) {
-        ManageCursor(bhat_text_window, msg);
+        bhat_text_window.ManageCursor(msg);
       }
       break;
     case Message::kKeyPush: {
