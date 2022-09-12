@@ -57,3 +57,9 @@ void BuiltInTextBox::InitializeTextWindow(int win_w, int win_h, const char *titl
 
   layer_manager->UpDown(this->text_window_layer_id, std::numeric_limits<int>::max());
 }
+
+void BuiltInTextBox::DrawTextCursor(bool visible) {
+  const auto color = visible ? ToColor(0) : ToColor(0xffffff);
+  const auto pos = Vector2D<int>{4 + 8*this->text_window_index, 5};
+  FillRectangle(*this->text_window->InnerWriter(), pos, {7, 15}, color);
+}

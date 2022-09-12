@@ -14,12 +14,6 @@
 #include "keyboard.hpp"
 #include "builtin_textbox.hpp"
 
-void DrawTextCursorBhat(BuiltInTextBox& box, bool visible) {
-  const auto color = visible ? ToColor(0) : ToColor(0xffffff);
-  const auto pos = Vector2D<int>{4 + 8*box.text_window_index, 5};
-  FillRectangle(*box.text_window->InnerWriter(), pos, {7, 15}, color);
-}
-
 struct Keymap {
   char32_t keycode;
   char32_t no_modifier;
@@ -78,15 +72,15 @@ void InputTextWindowBhat(BuiltInTextBox& box, char32_t unicode, uint8_t modifier
 
   const int max_chars = (box.text_window->InnerSize().x - 8) / 8 - 1;
   if (unicode == U'\b' && box.text_window_index > 0) {
-    DrawTextCursorBhat(false);
+    box.DrawTextCursor(false);
     --box.text_window_index;
     FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
     if (!content.empty()) {
       content.pop_back();
     }
-    DrawTextCursorBhat(true);
+    box.DrawTextCursor(true);
   } else if (unicode >= ' ' && box.text_window_index < max_chars) {
-    DrawTextCursorBhat(false);
+    box.DrawTextCursor(false);
     char32_t c = 0;
     for (int i = 0; i < sizeof keymap / sizeof *keymap; i++) {
       if (keymap[i].keycode == unicode) {
@@ -143,7 +137,7 @@ void InputTextWindowBhat(BuiltInTextBox& box, char32_t unicode, uint8_t modifier
       content.push_back(c);
       ++box.text_window_index;
     }
-    DrawTextCursorBhat(true);
+    box.DrawTextCursor(true);
   }
 
   layer_manager->Draw(box.text_window_layer_id);

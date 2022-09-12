@@ -156,7 +156,7 @@ extern "C" void KernelMainNewStack(
   // pertinent to textwindowbhat.cpp
   BuiltInTextBox bhat_text_window;
   bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
-  
+
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
   acpi::Initialize(acpi_table);
@@ -212,7 +212,7 @@ extern "C" void KernelMainNewStack(
             Timer{msg->arg.timer.timeout + normal_text_window.kTimer, normal_text_window.cursorTimer, 1});
         __asm__("sti");
         normal_text_window.cursor_visible = !normal_text_window.cursor_visible;
-        DrawTextCursor(normal_text_window, normal_text_window.cursor_visible);
+        normal_text_window.DrawTextCursor(normal_text_window.cursor_visible);
         layer_manager->Draw(normal_text_window.text_window_layer_id);
       } else if (msg->arg.timer.value == bhat_text_window.cursorTimer) {
         __asm__("cli");
@@ -220,8 +220,8 @@ extern "C" void KernelMainNewStack(
             Timer{msg->arg.timer.timeout + bhat_text_window.kTimer, bhat_text_window.cursorTimer, 1});
         __asm__("sti");
         bhat_text_window.cursor_visible = !bhat_text_window.cursor_visible;
-        DrawTextCursorBhat(bhat_text_window.cursor_visible);
-        layer_manager->Draw(text_window_bhat_layer_id);
+        bhat_text_window.DrawTextCursor(bhat_text_window.cursor_visible);
+        layer_manager->Draw(bhat_text_window.text_window_layer_id);
       }
       break;
     case Message::kKeyPush: {
@@ -230,9 +230,9 @@ extern "C" void KernelMainNewStack(
         if (msg->arg.keyboard.press) {
           InputTextWindow(normal_text_window, msg->arg.keyboard.unicode);
         }
-      } else if (act == text_window_bhat_layer_id) {
+      } else if (act == bhat_text_window.text_window_layer_id) {
         if (msg->arg.keyboard.press) {
-          InputTextWindowBhat(msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
+          InputTextWindowBhat(bhat_text_window, msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {

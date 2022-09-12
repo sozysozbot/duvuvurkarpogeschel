@@ -9,4 +9,5 @@ struct BuiltInTextBox {
   int text_window_index;
   void SetTimer(int timer_id, double timer_sec);
   void InitializeTextWindow(int win_w, int win_h, const char *title, Vector2D<int> pos);
+  void DrawTextCursor(bool visible);
 };
