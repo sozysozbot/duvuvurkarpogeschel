@@ -12,31 +12,26 @@
 #include "textwindowbhat.hpp"
 #include "syscall.hpp"
 #include "keyboard.hpp"
+#include "builtin_textbox.hpp"
 
-std::shared_ptr<ToplevelWindow> text_window_bhat;
-unsigned int text_window_bhat_layer_id;
-void InitializeTextWindowBhat() {
-  const int win_w = 368;
-  const int win_h = 52;
+void InitializeTextWindowBhat(BuiltInTextBox& box, int win_w, int win_h, const char *title, Vector2D<int> pos) {
+  box.text_window = std::make_shared<ToplevelWindow>(
+      win_w, win_h, screen_config.pixel_format, title);
+  DrawTextbox(*box.text_window->InnerWriter(), {0, 0}, box.text_window->InnerSize());
 
-  text_window_bhat = std::make_shared<ToplevelWindow>(
-      win_w, win_h, screen_config.pixel_format, "phertarsvirle'i slahurfaesal");
-  DrawTextbox(*text_window_bhat->InnerWriter(), {0, 0}, text_window_bhat->InnerSize());
-
-  text_window_bhat_layer_id = layer_manager->NewLayer()
-    .SetWindow(text_window_bhat)
+  box.text_window_layer_id = layer_manager->NewLayer()
+    .SetWindow(box.text_window)
     .SetDraggable(true)
-    .Move({300, 45})
+    .Move(pos)
     .ID();
 
-  layer_manager->UpDown(text_window_bhat_layer_id, std::numeric_limits<int>::max());
+  layer_manager->UpDown(box.text_window_layer_id, std::numeric_limits<int>::max());
 }
-int text_window_bhat_index;
 
-void DrawTextCursorBhat(bool visible) {
+void DrawTextCursorBhat(BuiltInTextBox& box, bool visible) {
   const auto color = visible ? ToColor(0) : ToColor(0xffffff);
-  const auto pos = Vector2D<int>{4 + 8*text_window_bhat_index, 5};
-  FillRectangle(*text_window_bhat->InnerWriter(), pos, {7, 15}, color);
+  const auto pos = Vector2D<int>{4 + 8*box.text_window_index, 5};
+  FillRectangle(*box.text_window->InnerWriter(), pos, {7, 15}, color);
 }
 
 struct Keymap {
@@ -87,24 +82,24 @@ bool isAltPressed(uint8_t modifier) {
   return modifier & (kLAltBitMask | kRAltBitMask);
 }
 
-void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
+void InputTextWindowBhat(BuiltInTextBox& box, char32_t unicode, uint8_t modifier) {
   static std::vector<char32_t> content;
   if (unicode == 0) {
     return;
   }
 
-  auto pos = []() { return Vector2D<int>{4 + 8*text_window_bhat_index, 6}; };
+  auto pos = [&box]() { return Vector2D<int>{4 + 8*box.text_window_index, 6}; };
 
-  const int max_chars = (text_window_bhat->InnerSize().x - 8) / 8 - 1;
-  if (unicode == U'\b' && text_window_bhat_index > 0) {
+  const int max_chars = (box.text_window->InnerSize().x - 8) / 8 - 1;
+  if (unicode == U'\b' && box.text_window_index > 0) {
     DrawTextCursorBhat(false);
-    --text_window_bhat_index;
-    FillRectangle(*text_window_bhat->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
+    --box.text_window_index;
+    FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
     if (!content.empty()) {
       content.pop_back();
     }
     DrawTextCursorBhat(true);
-  } else if (unicode >= ' ' && text_window_bhat_index < max_chars) {
+  } else if (unicode >= ' ' && box.text_window_index < max_chars) {
     DrawTextCursorBhat(false);
     char32_t c = 0;
     for (int i = 0; i < sizeof keymap / sizeof *keymap; i++) {
@@ -151,19 +146,19 @@ void InputTextWindowBhat(char32_t unicode, uint8_t modifier) {
       if (c == U'\u201e' /*"*/ && !content.empty() && content.back() == U'\u2e2e'	/*?*/) {
 
         // delete the previous question mark
-        --text_window_bhat_index;
-        FillRectangle(*text_window_bhat->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
+        --box.text_window_index;
+        FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
         content.pop_back();
 
         c = U'\u2047'; /* the ligature of the question mark and the double quote */
       }
 
-      WriteUnicodeChar(*text_window_bhat->InnerWriter(), pos(), c, ToColor(0));
+      WriteUnicodeChar(*box.text_window->InnerWriter(), pos(), c, ToColor(0));
       content.push_back(c);
-      ++text_window_bhat_index;
+      ++box.text_window_index;
     }
     DrawTextCursorBhat(true);
   }
 
-  layer_manager->Draw(text_window_bhat_layer_id);
+  layer_manager->Draw(box.text_window_layer_id);
 }

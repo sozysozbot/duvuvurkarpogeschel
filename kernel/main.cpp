@@ -155,7 +155,7 @@ extern "C" void KernelMainNewStack(
 
   // pertinent to textwindowbhat.cpp
   BuiltInTextBox bhat_text_window;
-  InitializeTextWindowBhat();
+  InitializeTextWindowBhat(bhat_text_window, 368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
   acpi::Initialize(acpi_table);
