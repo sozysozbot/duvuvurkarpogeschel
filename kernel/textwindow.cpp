@@ -10,9 +10,9 @@
 #include "terminal.hpp"
 #include "textwindow.hpp"
 #include "syscall.hpp"
-#include "builtin_textbox.hpp"
+#include "cursored_textbox.hpp"
 
-void InputTextWindow(BuiltInTextBox& box, char32_t unicode) {
+void InputTextWindow(CursoredTextBox& box, char32_t unicode) {
   if (unicode == 0) {
     return;
   }

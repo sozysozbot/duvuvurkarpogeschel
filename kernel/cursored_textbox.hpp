@@ -1,6 +1,6 @@
 #pragma once
 #include "window.hpp"
-struct BuiltInTextBox {
+struct CursoredTextBox {
   int cursorTimer;
   unsigned long kTimer;
   bool cursor_visible = false;

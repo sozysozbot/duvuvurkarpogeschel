@@ -12,7 +12,7 @@
 #include "textwindowbhat.hpp"
 #include "syscall.hpp"
 #include "keyboard.hpp"
-#include "builtin_textbox.hpp"
+#include "cursored_textbox.hpp"
 
 struct Keymap {
   char32_t keycode;
@@ -62,7 +62,7 @@ bool isAltPressed(uint8_t modifier) {
   return modifier & (kLAltBitMask | kRAltBitMask);
 }
 
-void InputTextWindowBhat(BuiltInTextBox& box, char32_t unicode, uint8_t modifier) {
+void InputTextWindowBhat(CursoredTextBox& box, char32_t unicode, uint8_t modifier) {
   static std::vector<char32_t> content;
   if (unicode == 0) {
     return;

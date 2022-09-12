@@ -35,16 +35,16 @@
 #include "osbanner.h"
 #include "textwindow.hpp"
 #include "textwindowbhat.hpp"
-#include "builtin_textbox.hpp"
+#include "cursored_textbox.hpp"
 
-void BuiltInTextBox::SetTimer(int timer_id, double timer_sec)
+void CursoredTextBox::SetTimer(int timer_id, double timer_sec)
 {
 	cursorTimer = timer_id;
 	kTimer = static_cast<unsigned long>(kTimerFreq * 0.5);
 	timer_manager->AddTimer(Timer{kTimer, cursorTimer, 1});
 }
 
-void BuiltInTextBox::InitializeTextWindow(int win_w, int win_h, const char *title, Vector2D<int> pos) {
+void CursoredTextBox::InitializeTextWindow(int win_w, int win_h, const char *title, Vector2D<int> pos) {
   this->text_window = std::make_shared<ToplevelWindow>(
       win_w, win_h, screen_config.pixel_format, title);
   DrawTextbox(*this->text_window->InnerWriter(), {0, 0}, this->text_window->InnerSize());
@@ -58,7 +58,7 @@ void BuiltInTextBox::InitializeTextWindow(int win_w, int win_h, const char *titl
   layer_manager->UpDown(this->text_window_layer_id, std::numeric_limits<int>::max());
 }
 
-void BuiltInTextBox::DrawTextCursor(bool visible) {
+void CursoredTextBox::DrawTextCursor(bool visible) {
   const auto color = visible ? ToColor(0) : ToColor(0xffffff);
   const auto pos = Vector2D<int>{4 + 8*this->text_window_index, 5};
   FillRectangle(*this->text_window->InnerWriter(), pos, {7, 15}, color);

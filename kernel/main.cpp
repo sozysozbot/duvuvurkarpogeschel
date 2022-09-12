@@ -41,7 +41,7 @@
 #include "osbanner.h"
 #include "textwindow.hpp"
 #include "textwindowbhat.hpp"
-#include "builtin_textbox.hpp"
+#include "cursored_textbox.hpp"
 
 int printk(const char* format, ...) {
   va_list ap;
@@ -121,7 +121,7 @@ FrameBufferConfig DrawBannerAndShrinkScreenTo768x543(const FrameBufferConfig& ol
   return new_config;
 }
 
-void ManageCursor(BuiltInTextBox &box, std::optional<Message> msg) {
+void ManageCursor(CursoredTextBox &box, std::optional<Message> msg) {
   __asm__("cli");
   timer_manager->AddTimer(
       Timer{msg->arg.timer.timeout + box.kTimer, box.cursorTimer, 1});
@@ -160,11 +160,11 @@ extern "C" void KernelMainNewStack(
   InitializeMainWindow();
 
   // pertinent to textwindow.cpp
-  BuiltInTextBox normal_text_window;
+  CursoredTextBox normal_text_window;
   normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {500, 100});
 
   // pertinent to textwindowbhat.cpp
-  BuiltInTextBox bhat_text_window;
+  CursoredTextBox bhat_text_window;
   bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
 
   layer_manager->Draw({{0, 0}, ScreenSize()});
