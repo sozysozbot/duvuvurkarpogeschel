@@ -25,11 +25,10 @@ void InitializeTextWindow(BuiltInTextBox& box, int win_w, int win_h, Vector2D<in
 
   layer_manager->UpDown(box.text_window_layer_id, std::numeric_limits<int>::max());
 }
-int text_window_index;
 
 void DrawTextCursor(BuiltInTextBox& box, bool visible) {
   const auto color = visible ? ToColor(0) : ToColor(0xffffff);
-  const auto pos = Vector2D<int>{4 + 8*text_window_index, 5};
+  const auto pos = Vector2D<int>{4 + 8*box.text_window_index, 5};
   FillRectangle(*box.text_window->InnerWriter(), pos, {7, 15}, color);
 }
 
@@ -38,19 +37,19 @@ void InputTextWindow(BuiltInTextBox& box, char32_t unicode) {
     return;
   }
 
-  auto pos = []() { return Vector2D<int>{4 + 8*text_window_index, 6}; };
+  auto pos = [&box]() { return Vector2D<int>{4 + 8*box.text_window_index, 6}; };
 
   const int max_chars = (box.text_window->InnerSize().x - 8) / 8 - 1;
-  if (unicode == U'\b' && text_window_index > 0) {
+  if (unicode == U'\b' && box.text_window_index > 0) {
     DrawTextCursor(box, false);
-    --text_window_index;
+    --box.text_window_index;
     FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
     DrawTextCursor(box, true);
-  } else if (unicode >= ' ' && text_window_index < max_chars) {
+  } else if (unicode >= ' ' && box.text_window_index < max_chars) {
     DrawTextCursor(box, false);
     // TODO: This should fail once we allow inputting a fullwidth character from the keyboard
     WriteUnicodeChar(*box.text_window->InnerWriter(), pos(), unicode, ToColor(0));
-    ++text_window_index;
+    ++box.text_window_index;
     DrawTextCursor(box, true);
   }
 
