@@ -37,7 +37,9 @@
 #include "textwindowbhat.hpp"
 #include "builtin_textbox.hpp"
 
-BuiltInTextBox::BuiltInTextBox(int timer_id, double timer_sec) : cursorTimer(timer_id), kTimer(static_cast<unsigned long>(kTimerFreq * 0.5))
+void BuiltInTextBox::SetTimer(int timer_id, double timer_sec)
 {
+	cursorTimer = timer_id;
+	kTimer = static_cast<unsigned long>(kTimerFreq * 0.5);
 	timer_manager->AddTimer(Timer{kTimer, cursorTimer, 1});
 }

@@ -156,10 +156,12 @@ extern "C" void KernelMainNewStack(
   InitializeLAPICTimer();
 
   // pertinent to textwindow.cpp
-  BuiltInTextBox normal_text_window{1, 0.5};
+  BuiltInTextBox normal_text_window;
+  normal_text_window.SetTimer(1, 0.5);
 
   // pertinent to textwindowbhat.cpp
-  BuiltInTextBox bhat_text_window{2, 0.5};
+  BuiltInTextBox bhat_text_window;
+  bhat_text_window.SetTimer(2, 0.5);
 
   InitializeSyscall();
 
