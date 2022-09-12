@@ -1,4 +1,5 @@
-void InitializeTextWindow();
-void DrawTextCursor(bool visible);
-void InputTextWindow(char32_t unicode);
-extern unsigned int text_window_layer_id;
+#pragma once
+#include "builtin_textbox.hpp"
+void InitializeTextWindow(BuiltInTextBox& box, int win_w, int win_h, Vector2D<int> pos);
+void DrawTextCursor(BuiltInTextBox& box, bool visible);
+void InputTextWindow(BuiltInTextBox& box, char32_t unicode);

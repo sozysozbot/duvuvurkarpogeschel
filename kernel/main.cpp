@@ -148,19 +148,20 @@ extern "C" void KernelMainNewStack(
 
   InitializeLayer();
   InitializeMainWindow();
-  InitializeTextWindow();
+
+  // pertinent to textwindow.cpp
+  BuiltInTextBox normal_text_window;
+  InitializeTextWindow(normal_text_window, 168, 52, {500, 100});
+
+  // pertinent to textwindowbhat.cpp
+  BuiltInTextBox bhat_text_window;
   InitializeTextWindowBhat();
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
   acpi::Initialize(acpi_table);
   InitializeLAPICTimer();
 
-  // pertinent to textwindow.cpp
-  BuiltInTextBox normal_text_window;
   normal_text_window.SetTimer(1, 0.5);
-
-  // pertinent to textwindowbhat.cpp
-  BuiltInTextBox bhat_text_window;
   bhat_text_window.SetTimer(2, 0.5);
 
   InitializeSyscall();
@@ -210,8 +211,8 @@ extern "C" void KernelMainNewStack(
             Timer{msg->arg.timer.timeout + normal_text_window.kTimer, normal_text_window.cursorTimer, 1});
         __asm__("sti");
         normal_text_window.cursor_visible = !normal_text_window.cursor_visible;
-        DrawTextCursor(normal_text_window.cursor_visible);
-        layer_manager->Draw(text_window_layer_id);
+        DrawTextCursor(normal_text_window, normal_text_window.cursor_visible);
+        layer_manager->Draw(normal_text_window.text_window_layer_id);
       } else if (msg->arg.timer.value == bhat_text_window.cursorTimer) {
         __asm__("cli");
         timer_manager->AddTimer(
@@ -224,9 +225,9 @@ extern "C" void KernelMainNewStack(
       break;
     case Message::kKeyPush: {
       auto act = active_layer->GetActive(); 
-      if (act == text_window_layer_id) {
+      if (act == normal_text_window.text_window_layer_id) {
         if (msg->arg.keyboard.press) {
-          InputTextWindow(msg->arg.keyboard.unicode);
+          InputTextWindow(normal_text_window, msg->arg.keyboard.unicode);
         }
       } else if (act == text_window_bhat_layer_id) {
         if (msg->arg.keyboard.press) {
