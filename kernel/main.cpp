@@ -56,19 +56,19 @@ int printk(const char* format, ...) {
   return result;
 }
 
-std::shared_ptr<ToplevelWindow> main_window;
-unsigned int main_window_layer_id;
-void InitializeMainWindow() {
-  main_window = std::make_shared<ToplevelWindow>(
+std::shared_ptr<ToplevelWindow> counter_window;
+unsigned int counter_window_layer_id;
+void InitializeCounterWindow() {
+  counter_window = std::make_shared<ToplevelWindow>(
       160, 52, screen_config.pixel_format, "kinfiter");
 
-  main_window_layer_id = layer_manager->NewLayer()
-    .SetWindow(main_window)
+  counter_window_layer_id = layer_manager->NewLayer()
+    .SetWindow(counter_window)
     .SetDraggable(true)
     .Move({300, 100})
     .ID();
 
-  layer_manager->UpDown(main_window_layer_id, std::numeric_limits<int>::max());
+  layer_manager->UpDown(counter_window_layer_id, std::numeric_limits<int>::max());
 }
 
 alignas(16) uint8_t kernel_main_stack[1024 * 1024];
@@ -157,7 +157,7 @@ extern "C" void KernelMainNewStack(
   InitializePCI();
 
   InitializeLayer();
-  InitializeMainWindow();
+  InitializeCounterWindow();
 
   // pertinent to textwindow.cpp
   CursoredTextBox normal_text_window;
@@ -197,9 +197,9 @@ extern "C" void KernelMainNewStack(
     __asm__("sti");
 
     sprintf(str, "%010lu", tick);
-    FillRectangle(*main_window->InnerWriter(), {20, 4}, {8 * 10, 16}, {0xc6, 0xc6, 0xc6});
-    WriteString(*main_window->InnerWriter(), {20, 4}, str, {0, 0, 0});
-    layer_manager->Draw(main_window_layer_id);
+    FillRectangle(*counter_window->InnerWriter(), {20, 4}, {8 * 10, 16}, {0xc6, 0xc6, 0xc6});
+    WriteString(*counter_window->InnerWriter(), {20, 4}, str, {0, 0, 0});
+    layer_manager->Draw(counter_window_layer_id);
 
     __asm__("cli");
     auto msg = main_task.ReceiveMessage();
