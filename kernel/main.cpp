@@ -151,11 +151,12 @@ extern "C" void KernelMainNewStack(
 
   // pertinent to textwindow.cpp
   BuiltInTextBox normal_text_window;
-  InitializeTextWindow(normal_text_window, 168, 52, "slahurfaesal", {500, 100});
+  normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {500, 100});
 
   // pertinent to textwindowbhat.cpp
   BuiltInTextBox bhat_text_window;
-  InitializeTextWindowBhat(bhat_text_window, 368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
+  bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
+  
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
   acpi::Initialize(acpi_table);

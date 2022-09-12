@@ -43,3 +43,17 @@ void BuiltInTextBox::SetTimer(int timer_id, double timer_sec)
 	kTimer = static_cast<unsigned long>(kTimerFreq * 0.5);
 	timer_manager->AddTimer(Timer{kTimer, cursorTimer, 1});
 }
+
+void BuiltInTextBox::InitializeTextWindow(int win_w, int win_h, const char *title, Vector2D<int> pos) {
+  this->text_window = std::make_shared<ToplevelWindow>(
+      win_w, win_h, screen_config.pixel_format, title);
+  DrawTextbox(*this->text_window->InnerWriter(), {0, 0}, this->text_window->InnerSize());
+
+  this->text_window_layer_id = layer_manager->NewLayer()
+    .SetWindow(this->text_window)
+    .SetDraggable(true)
+    .Move(pos)
+    .ID();
+
+  layer_manager->UpDown(this->text_window_layer_id, std::numeric_limits<int>::max());
+}
