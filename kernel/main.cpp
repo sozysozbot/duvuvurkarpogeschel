@@ -121,6 +121,16 @@ FrameBufferConfig DrawBannerAndShrinkScreenTo768x543(const FrameBufferConfig& ol
   return new_config;
 }
 
+void ManageCursor(BuiltInTextBox &box, std::optional<Message> msg) {
+  __asm__("cli");
+  timer_manager->AddTimer(
+      Timer{msg->arg.timer.timeout + box.kTimer, box.cursorTimer, 1});
+  __asm__("sti");
+  box.cursor_visible = !box.cursor_visible;
+  box.DrawTextCursor(box.cursor_visible);
+  layer_manager->Draw(box.text_window_layer_id);
+}
+
 extern "C" void KernelMainNewStack(
     const FrameBufferConfig& physical_frame_buffer_config_ref,
     const MemoryMap& memory_map_ref,
@@ -207,21 +217,9 @@ extern "C" void KernelMainNewStack(
       break;
     case Message::kTimerTimeout:
       if (msg->arg.timer.value == normal_text_window.cursorTimer) {
-        __asm__("cli");
-        timer_manager->AddTimer(
-            Timer{msg->arg.timer.timeout + normal_text_window.kTimer, normal_text_window.cursorTimer, 1});
-        __asm__("sti");
-        normal_text_window.cursor_visible = !normal_text_window.cursor_visible;
-        normal_text_window.DrawTextCursor(normal_text_window.cursor_visible);
-        layer_manager->Draw(normal_text_window.text_window_layer_id);
+        ManageCursor(normal_text_window, msg);
       } else if (msg->arg.timer.value == bhat_text_window.cursorTimer) {
-        __asm__("cli");
-        timer_manager->AddTimer(
-            Timer{msg->arg.timer.timeout + bhat_text_window.kTimer, bhat_text_window.cursorTimer, 1});
-        __asm__("sti");
-        bhat_text_window.cursor_visible = !bhat_text_window.cursor_visible;
-        bhat_text_window.DrawTextCursor(bhat_text_window.cursor_visible);
-        layer_manager->Draw(bhat_text_window.text_window_layer_id);
+        ManageCursor(bhat_text_window, msg);
       }
       break;
     case Message::kKeyPush: {
