@@ -41,6 +41,7 @@
 #include "osbanner.h"
 #include "textwindow.hpp"
 #include "textwindowbhat.hpp"
+#include "builtin_textbox.hpp"
 
 int printk(const char* format, ...) {
   va_list ap;
@@ -119,15 +120,6 @@ FrameBufferConfig DrawBannerAndShrinkScreenTo768x543(const FrameBufferConfig& ol
     
   return new_config;
 }
-
-struct BuiltInTextBox {
-  const int cursorTimer;
-  const unsigned long kTimer;
-  bool cursor_visible = false;
-  BuiltInTextBox(int timer_id, double timer_sec) : cursorTimer(timer_id), kTimer(static_cast<unsigned long>(kTimerFreq * 0.5)) {
-    timer_manager->AddTimer(Timer{kTimer, cursorTimer, 1});
-  }
-};
 
 extern "C" void KernelMainNewStack(
     const FrameBufferConfig& physical_frame_buffer_config_ref,
