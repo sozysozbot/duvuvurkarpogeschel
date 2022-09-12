@@ -12,9 +12,9 @@
 #include "syscall.hpp"
 #include "builtin_textbox.hpp"
 
-void InitializeTextWindow(BuiltInTextBox& box, int win_w, int win_h, Vector2D<int> pos) {
+void InitializeTextWindow(BuiltInTextBox& box, int win_w, int win_h, const char *title, Vector2D<int> pos) {
   box.text_window = std::make_shared<ToplevelWindow>(
-      win_w, win_h, screen_config.pixel_format, "slahurfaesal");
+      win_w, win_h, screen_config.pixel_format, title);
   DrawTextbox(*box.text_window->InnerWriter(), {0, 0}, box.text_window->InnerSize());
 
   box.text_window_layer_id = layer_manager->NewLayer()

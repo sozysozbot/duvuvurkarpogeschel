@@ -151,7 +151,7 @@ extern "C" void KernelMainNewStack(
 
   // pertinent to textwindow.cpp
   BuiltInTextBox normal_text_window;
-  InitializeTextWindow(normal_text_window, 168, 52, {500, 100});
+  InitializeTextWindow(normal_text_window, 168, 52, "slahurfaesal", {500, 100});
 
   // pertinent to textwindowbhat.cpp
   BuiltInTextBox bhat_text_window;
