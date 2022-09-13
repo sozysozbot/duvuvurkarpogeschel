@@ -1,0 +1,1 @@
+struct PekzepChar { const char *hanzi; const char *praige; };

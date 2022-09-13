@@ -3,7 +3,7 @@ OBJS = cursored_textbox.o main.o textwindow.o textwindowbhat.o textwindowpekzep.
        hankaku.o zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
 	   libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
        window.o layer.o timer.o frame_buffer.o acpi.o keyboard.o task.o terminal.o \
-       fat.o syscall.o file.o \
+       fat.o syscall.o file.o praige_r_dict.o \
        usb/memory.o usb/device.o usb/xhci/ring.o usb/xhci/trb.o usb/xhci/xhci.o \
        usb/xhci/port.o usb/xhci/device.o usb/xhci/devmgr.o usb/xhci/registers.o \
        usb/classdriver/base.o usb/classdriver/hid.o usb/classdriver/keyboard.o \
@@ -58,6 +58,9 @@ zenkaku.bin: zenkaku.txt
 
 zenkaku.o: zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
+
+praige_r_dict.c:
+	./download_and_convert_praige_dict.sh
 
 .%.d: %.bin
 	touch $@

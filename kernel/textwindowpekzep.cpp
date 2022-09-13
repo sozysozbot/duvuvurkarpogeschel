@@ -2,6 +2,7 @@
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
 #include "textwindowpekzep.hpp"
+#include "praige_r_dict.h"
 
 void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier) {
   if (unicode == 0) {
