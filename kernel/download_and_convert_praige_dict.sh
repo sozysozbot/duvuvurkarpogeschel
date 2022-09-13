@@ -7,3 +7,4 @@ echo '#include "praige_r_dict.h"' > praige_r_dict.c
 echo 'struct PekzepChar dict[] = {' >> praige_r_dict.c
 cat praige_r.tsv | awk '{ gsub(/[^\t]+/,"\x22&\x22"); print "{",$1,",",$2,"}," }' >> praige_r_dict.c
 echo '};' >> praige_r_dict.c
+echo 'struct PekzepChar *dict_end = dict + (sizeof dict / sizeof *dict);' >> praige_r_dict.c

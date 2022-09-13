@@ -375,3 +375,4 @@ struct PekzepChar dict[] = {
 { "順" , "puir" },
 { "順" , "puri" },
 };
+struct PekzepChar *dict_end = dict + (sizeof dict / sizeof *dict);
