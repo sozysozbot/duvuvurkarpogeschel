@@ -194,7 +194,7 @@ void DrawWindowTitle(PixelWriter& writer, const char* title, bool active) {
   }
 
   FillRectangle(writer, {3, 3}, {win_w - 6, 18}, ToColor(bgcolor));
-  WriteString(writer, {24, 4}, title, ToColor(0xffffff));
+  WriteUTF8String(writer, {24, 4}, title, ToColor(0xffffff));
 
   for (int y = 0; y < kCloseButtonHeight; ++y) {
     for (int x = 0; x < kCloseButtonWidth; ++x) {

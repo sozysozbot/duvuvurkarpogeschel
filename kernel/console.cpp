@@ -72,7 +72,7 @@ void Console::Newline() {
     FillRectangle(*writer_, {0, 0}, {8 * kColumns, 16 * kRows}, bg_color_);
     for (int row = 0; row < kRows - 1; ++row) {
       memcpy(buffer_[row], buffer_[row + 1], kColumns + 1);
-      WriteString(*writer_, Vector2D<int>{0, 16 * row}, buffer_[row], fg_color_);
+      WriteUTF8String(*writer_, Vector2D<int>{0, 16 * row}, buffer_[row], fg_color_);
     }
     memset(buffer_[kRows - 1], 0, kColumns + 1);
   }
@@ -81,7 +81,7 @@ void Console::Newline() {
 void Console::Refresh() {
   FillRectangle(*writer_, {0, 0}, {8 * kColumns, 16 * kRows}, bg_color_);
   for (int row = 0; row < kRows; ++row) {
-    WriteString(*writer_, Vector2D<int>{0, 16 * row}, buffer_[row], fg_color_);
+    WriteUTF8String(*writer_, Vector2D<int>{0, 16 * row}, buffer_[row], fg_color_);
   }
 }
 

@@ -835,7 +835,7 @@ Rectangle<int> Terminal::HistoryUpDown(int direction) {
   strcpy(&linebuf_[0], history);
   linebuf_index_ = strlen(history);
 
-  WriteString(*window_->Writer(), first_pos, history, {255, 255, 255});
+  WriteUTF8String(*window_->Writer(), first_pos, history, {255, 255, 255});
   cursor_.x = linebuf_index_ + 1;
   return draw_area;
 }

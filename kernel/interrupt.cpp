@@ -53,13 +53,13 @@ namespace {
   }
 
   void PrintFrame(InterruptFrame* frame, const char* exp_name) {
-    WriteString(*screen_writer, {500, 16*0}, exp_name, {0, 0, 0});
-    WriteString(*screen_writer, {500, 16*1}, "CS:RIP", {0, 0, 0});
+    WriteUTF8String(*screen_writer, {500, 16*0}, exp_name, {0, 0, 0});
+    WriteUTF8String(*screen_writer, {500, 16*1}, "CS:RIP", {0, 0, 0});
     PrintHex(frame->cs, 4, {500 + 8*7, 16*1});
     PrintHex(frame->rip, 16, {500 + 8*12, 16*1});
-    WriteString(*screen_writer, {500, 16*2}, "RFLAGS", {0, 0, 0});
+    WriteUTF8String(*screen_writer, {500, 16*2}, "RFLAGS", {0, 0, 0});
     PrintHex(frame->rflags, 16, {500 + 8*7, 16*2});
-    WriteString(*screen_writer, {500, 16*3}, "SS:RSP", {0, 0, 0});
+    WriteUTF8String(*screen_writer, {500, 16*3}, "SS:RSP", {0, 0, 0});
     PrintHex(frame->ss, 4, {500 + 8*7, 16*3});
     PrintHex(frame->rsp, 16, {500 + 8*12, 16*3});
   }
@@ -83,7 +83,7 @@ namespace {
     }
     KillApp(frame);
     PrintFrame(frame, "#PF");
-    WriteString(*screen_writer, {500, 16*4}, "ERR", {0, 0, 0});
+    WriteUTF8String(*screen_writer, {500, 16*4}, "ERR", {0, 0, 0});
     PrintHex(error_code, 16, {500 + 8*4, 16*4});
     while (true) __asm__("hlt");
   }
@@ -93,7 +93,7 @@ namespace {
   void IntHandler ## fault_name (InterruptFrame* frame, uint64_t error_code) { \
     KillApp(frame); \
     PrintFrame(frame, "#" #fault_name); \
-    WriteString(*screen_writer, {500, 16*4}, "ERR", {0, 0, 0}); \
+    WriteUTF8String(*screen_writer, {500, 16*4}, "ERR", {0, 0, 0}); \
     PrintHex(error_code, 16, {500 + 8*4, 16*4}); \
     while (true) __asm__("hlt"); \
   }

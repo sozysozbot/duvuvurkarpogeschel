@@ -119,7 +119,7 @@ SYSCALL(WinWriteString) {
   return DoWinFunc(
       [](Window& win,
          int x, int y, uint32_t color, const char* s) {
-        WriteString(*win.Writer(), {x, y}, s, ToColor(color));
+        WriteUTF8String(*win.Writer(), {x, y}, s, ToColor(color));
         return Result{ 0, 0 };
       }, arg1, arg2, arg3, arg4, reinterpret_cast<const char*>(arg5));
 }

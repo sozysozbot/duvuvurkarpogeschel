@@ -194,7 +194,7 @@ extern "C" void KernelMainNewStack(
 
     sprintf(str, "%010lu", tick);
     FillRectangle(*counter_window->InnerWriter(), {20, 4}, {8 * 10, 16}, {0xc6, 0xc6, 0xc6});
-    WriteString(*counter_window->InnerWriter(), {20, 4}, str, {0, 0, 0});
+    WriteUTF8String(*counter_window->InnerWriter(), {20, 4}, str, {0, 0, 0});
     layer_manager->Draw(counter_window_layer_id);
 
     __asm__("cli");

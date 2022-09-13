@@ -104,13 +104,22 @@ void WriteAscii(PixelWriter& writer, Vector2D<int> pos, char c, const PixelColor
   }
 }
 
-void WriteString(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color) {
+void WriteUTF8String(PixelWriter& writer, Vector2D<int> pos, const char* s, const PixelColor& color) {
   int x = 0;
   while (*s) {
     const auto [ u32, bytes ] = ConvertUTF8To32(s);
     WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, u32, color);
     s += bytes;
     x += IsHankaku(u32) ? 1 : 2;
+  }
+}
+
+void WriteUTF32String(PixelWriter& writer, Vector2D<int> pos, char32_t* s, const PixelColor& color) {
+  int x = 0;
+  while (*s) {
+    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, *s, color);
+    x += IsHankaku(*s) ? 1 : 2;
+    s++;
   }
 }
 
