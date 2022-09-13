@@ -10,7 +10,7 @@ struct IMEState {
   std::vector<char32_t> non_solidified;
   int candidate_index;
   std::vector<std::u32string> candidates;
-  void Render(CursoredTextBox& box);
+  void Render(CursoredTextBox& box, bool non_solidified_is_updated);
   void ComputeCandidatesAndStore();
 };
 
@@ -31,9 +31,10 @@ void IMEState::ComputeCandidatesAndStore() {
       this->candidates.push_back(c->hanzi);
     }
   }
+  this->candidate_index = 0;
 }
 
-void IMEState::Render(CursoredTextBox& box) {
+void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
   // first, erase everything
   box.ClearTextWindow();
 
@@ -48,7 +49,9 @@ void IMEState::Render(CursoredTextBox& box) {
   box.cursor_index = solidified_width + unsolidified_width;
   box.DrawTextCursor(true);
 
-  ComputeCandidatesAndStore();
+  if (non_solidified_is_updated) {
+    ComputeCandidatesAndStore();
+  }
   // want to prepare a string of the form U"<此>時 火 車 善 子"
   std::u32string candidate_display = U"";
   for (int i = 0; i < this->candidates.size(); i++) {
@@ -71,22 +74,32 @@ void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modif
 
   if (keycode == 79 /* RightArrow */) {
     state.candidate_index++; // todo: error check
-    state.Render(box);
+    state.Render(box, false);
   } else if (keycode == 80 /* LeftArrow */) {
     state.candidate_index--; // todo: error check
-    state.Render(box);
+    state.Render(box, false);
   } else if (unicode == U'\b') {
     box.DrawTextCursor(false);
     if (!state.non_solidified.empty()) {
       state.non_solidified.pop_back();
+      state.Render(box, true);
     } else if (!state.solidified.empty()) {
       state.solidified.pop_back();
+      state.Render(box, false);
     }
-    state.Render(box);
     box.DrawTextCursor(true);
   } else if (U'a' <= unicode && unicode <= U'z') {
     state.non_solidified.push_back(unicode);
-    state.Render(box);
+    state.Render(box, true);
+  } else if (unicode == U' ') {
+    if (state.non_solidified.empty()) {
+      state.solidified.push_back(U' ');
+    } else {
+      auto new_str = state.candidates[state.candidate_index];
+      state.solidified.insert(state.solidified.end(), new_str.begin(), new_str.end());
+      state.non_solidified.clear();
+      state.Render(box, true);
+    }
   }
 
   if (unicode == 0) {
