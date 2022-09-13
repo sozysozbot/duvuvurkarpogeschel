@@ -94,12 +94,16 @@ void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
 void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier, uint8_t keycode) {
   static IMEState state;
 
-  if (keycode == 79 /* RightArrow */) {
-    state.candidate_index++; // todo: error check
-    state.Render(box, false);
-  } else if (keycode == 80 /* LeftArrow */) {
-    state.candidate_index--; // todo: error check
-    state.Render(box, false);
+  if (keycode == 79 /* RightArrow */ && !state.candidates.empty()) {
+    if (state.candidate_index != state.candidates.size() - 1) {
+      state.candidate_index++;
+      state.Render(box, false);
+    }
+  } else if (keycode == 80 /* LeftArrow */ && !state.candidates.empty()) {
+    if (state.candidate_index != 0) {
+      state.candidate_index--;
+      state.Render(box, false);
+    }
   } else if (unicode == U'\b') {
     box.DrawTextCursor(false);
     if (!state.non_solidified.empty()) {
