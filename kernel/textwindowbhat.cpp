@@ -1,16 +1,9 @@
-#include <cstdint>
-#include <cstddef>
-#include <limits>
-#include <numeric>
 #include <vector>
 
 #include "font.hpp"
-#include "memory_manager.hpp"
 #include "window.hpp"
 #include "layer.hpp"
-#include "terminal.hpp"
 #include "textwindowbhat.hpp"
-#include "syscall.hpp"
 #include "keyboard.hpp"
 #include "cursored_textbox.hpp"
 

@@ -1,16 +1,7 @@
-#include <cstdint>
-#include <cstddef>
-#include <limits>
-#include <numeric>
-
 #include "font.hpp"
-#include "memory_manager.hpp"
-#include "window.hpp"
 #include "layer.hpp"
-#include "terminal.hpp"
-#include "textwindow.hpp"
-#include "syscall.hpp"
 #include "cursored_textbox.hpp"
+#include "textwindow.hpp"
 
 void InputTextWindow(CursoredTextBox& box, char32_t unicode) {
   if (unicode == 0) {
