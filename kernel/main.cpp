@@ -41,6 +41,7 @@
 #include "osbanner.h"
 #include "textwindow.hpp"
 #include "textwindowbhat.hpp"
+#include "textwindowpekzep.hpp"
 #include "cursored_textbox.hpp"
 
 int printk(const char* format, ...) {
@@ -65,7 +66,7 @@ void InitializeCounterWindow() {
   counter_window_layer_id = layer_manager->NewLayer()
     .SetWindow(counter_window)
     .SetDraggable(true)
-    .Move({300, 100})
+    .Move({320, 70})
     .ID();
 
   layer_manager->UpDown(counter_window_layer_id, std::numeric_limits<int>::max());
@@ -151,11 +152,15 @@ extern "C" void KernelMainNewStack(
 
   // pertinent to textwindow.cpp
   CursoredTextBox normal_text_window;
-  normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {500, 100});
+  normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {520, 70});
 
   // pertinent to textwindowbhat.cpp
   CursoredTextBox bhat_text_window;
-  bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {300, 45});
+  bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {320, 15});
+
+  // pertinent to textwindowpekzep.cpp
+  CursoredTextBox pekzep_text_window;
+  pekzep_text_window.InitializeTextWindow(368, 70, "pergvirle'i slahurfaesal", {320, 125}, 18);
 
   layer_manager->Draw({{0, 0}, ScreenSize()});
 
@@ -164,6 +169,7 @@ extern "C" void KernelMainNewStack(
 
   normal_text_window.SetTimer(1, 0.5);
   bhat_text_window.SetTimer(2, 0.5);
+  pekzep_text_window.SetTimer(3, 0.5);
 
   InitializeSyscall();
 
@@ -210,6 +216,8 @@ extern "C" void KernelMainNewStack(
         normal_text_window.ManageCursor(msg);
       } else if (msg->arg.timer.value == bhat_text_window.cursorTimer) {
         bhat_text_window.ManageCursor(msg);
+      } else if (msg->arg.timer.value == pekzep_text_window.cursorTimer) {
+        pekzep_text_window.ManageCursor(msg);
       }
       break;
     case Message::kKeyPush: {
@@ -221,6 +229,10 @@ extern "C" void KernelMainNewStack(
       } else if (act == bhat_text_window.text_window_layer_id) {
         if (msg->arg.keyboard.press) {
           InputTextWindowBhat(bhat_text_window, msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
+        }
+      } else if (act == pekzep_text_window.text_window_layer_id) {
+        if (msg->arg.keyboard.press) {
+          InputTextWindowPekzep(pekzep_text_window, msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {
