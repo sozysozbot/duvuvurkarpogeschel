@@ -271,6 +271,10 @@ bool IsHankaku(char32_t c) {
   }
 }
 
+bool IsGlyphImplemented(char32_t c) {
+  return GetGlyphFromHankakuBin(c) || GetGlyphFromZenkakuBin(c);
+}
+
 WithError<FT_Face> NewFTFace() {
   FT_Face face;
   if (int err = FT_New_Memory_Face(

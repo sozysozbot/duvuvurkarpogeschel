@@ -22,3 +22,4 @@ WithError<FT_Face> NewFTFace();
 Error WriteUnicodeChar(PixelWriter& writer, Vector2D<int> pos,
                    char32_t c, const PixelColor& color);
 void InitializeFont();
+bool IsGlyphImplemented(char32_t c);

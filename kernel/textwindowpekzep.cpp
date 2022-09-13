@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 #include "font.hpp"
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
@@ -22,12 +23,21 @@ bool startsWith(const char32_t* haystack, std::vector<char32_t>& needle) {
   return true;
 }
 
+bool AllGlyphsImplemented(const char32_t *p) {
+  for (; *p; p++) {
+    if (!IsGlyphImplemented(*p)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void IMEState::ComputeCandidatesAndStore() {
   this->candidates.clear();
 
   if (this->non_solidified.empty()) return;
   for (PekzepChar *c = dict; c != dict_end; c++) {
-    if (startsWith(c->praige, this->non_solidified)) {
+    if (startsWith(c->praige, this->non_solidified) && AllGlyphsImplemented(c->hanzi)) {
       this->candidates.push_back(c->hanzi);
     }
   }
