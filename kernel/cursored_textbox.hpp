@@ -4,7 +4,7 @@ struct CursoredTextBox {
   unsigned long kTimer;
   bool cursor_visible = false;
   std::shared_ptr<ToplevelWindow> text_window;
-  int text_window_index;
+  int cursor_index;
   int cursorTimer;
   unsigned int text_window_layer_id;
   void SetTimer(int timer_id, double timer_sec);

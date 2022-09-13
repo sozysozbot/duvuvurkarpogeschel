@@ -61,18 +61,18 @@ void InputTextWindowBhat(CursoredTextBox& box, char32_t unicode, uint8_t modifie
     return;
   }
 
-  auto pos = [&box]() { return Vector2D<int>{4 + 8*box.text_window_index, 6}; };
+  auto pos = [&box]() { return Vector2D<int>{4 + 8*box.cursor_index, 6}; };
 
   const int max_chars = (box.text_window->InnerSize().x - 8) / 8 - 1;
-  if (unicode == U'\b' && box.text_window_index > 0) {
+  if (unicode == U'\b' && box.cursor_index > 0) {
     box.DrawTextCursor(false);
-    --box.text_window_index;
+    --box.cursor_index;
     FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
     if (!content.empty()) {
       content.pop_back();
     }
     box.DrawTextCursor(true);
-  } else if (unicode >= ' ' && box.text_window_index < max_chars) {
+  } else if (unicode >= ' ' && box.cursor_index < max_chars) {
     box.DrawTextCursor(false);
     char32_t c = 0;
     for (int i = 0; i < sizeof keymap / sizeof *keymap; i++) {
@@ -119,7 +119,7 @@ void InputTextWindowBhat(CursoredTextBox& box, char32_t unicode, uint8_t modifie
       if (c == U'\u201e' /*"*/ && !content.empty() && content.back() == U'\u2e2e'	/*?*/) {
 
         // delete the previous question mark
-        --box.text_window_index;
+        --box.cursor_index;
         FillRectangle(*box.text_window->InnerWriter(), pos(), {8, 16}, ToColor(0xffffff));
         content.pop_back();
 
@@ -128,7 +128,7 @@ void InputTextWindowBhat(CursoredTextBox& box, char32_t unicode, uint8_t modifie
 
       WriteUnicodeChar(*box.text_window->InnerWriter(), pos(), c, ToColor(0));
       content.push_back(c);
-      ++box.text_window_index;
+      ++box.cursor_index;
     }
     box.DrawTextCursor(true);
   }

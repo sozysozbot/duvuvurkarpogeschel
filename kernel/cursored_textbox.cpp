@@ -28,7 +28,7 @@ void CursoredTextBox::InitializeTextWindow(int win_w, int win_h, const char *tit
 
 void CursoredTextBox::DrawTextCursor(bool visible) {
   const auto color = visible ? ToColor(0) : ToColor(0xffffff);
-  const auto pos = Vector2D<int>{4 + 8*this->text_window_index, 5};
+  const auto pos = Vector2D<int>{4 + 8*this->cursor_index, 5};
   FillRectangle(*this->text_window->InnerWriter(), pos, {7, 15}, color);
 }
 
