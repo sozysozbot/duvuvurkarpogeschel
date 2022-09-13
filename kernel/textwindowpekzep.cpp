@@ -31,7 +31,6 @@ void IMEState::ComputeCandidatesAndStore() {
       this->candidates.push_back(c->hanzi);
     }
   }
-  this->candidate_index = 0;
 }
 
 void IMEState::Render(CursoredTextBox& box) {
@@ -50,8 +49,8 @@ void IMEState::Render(CursoredTextBox& box) {
   box.DrawTextCursor(true);
 
   ComputeCandidatesAndStore();
-  // want to prepare a string of the form U"[此]時 火 車 善 子"
-  std::u32string candidate_display;
+  // want to prepare a string of the form U"<此>時 火 車 善 子"
+  std::u32string candidate_display = U"";
   for (int i = 0; i < this->candidates.size(); i++) {
     candidate_display += i == this->candidate_index ? U"<" : i == this->candidate_index + 1 ? U">" : U" ";
     candidate_display += this->candidates[i];
@@ -85,8 +84,9 @@ void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modif
     }
     state.Render(box);
     box.DrawTextCursor(true);
-  } else if (unicode == U'a') {
-    box.ClearTextWindow();
+  } else if (U'a' <= unicode && unicode <= U'z') {
+    state.non_solidified.push_back(unicode);
+    state.Render(box);
   }
 
   if (unicode == 0) {
