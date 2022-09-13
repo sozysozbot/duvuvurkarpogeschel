@@ -144,6 +144,41 @@ int WriteUTF32CharVec(PixelWriter& writer, Vector2D<int> pos, const std::vector<
   return x;
 }
 
+/**
+ * @returns the visual width of the string, given in the units of a halfwidth character
+ */
+int WriteUTF32StringWithUpperLimit(PixelWriter& writer, Vector2D<int> pos, const char32_t* s, const PixelColor& color, int max_width) {
+  int x = 0;
+  while (*s) {
+    int new_x = x + (IsHankaku(*s) ? 1 : 2);
+    if (new_x > max_width) {
+      return x;
+    }
+    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, *s, color);
+    x = new_x;
+    s++;
+  }
+  return x;
+}
+
+/**
+ * @returns the visual width of the string, given in the units of a halfwidth character
+ */
+int WriteUTF32CharVecWithUpperLimit(PixelWriter& writer, Vector2D<int> pos, const std::vector<char32_t>& vec, const PixelColor& color, int max_width) {
+  int x = 0;
+  auto s = vec.begin();
+  while (s != vec.end()) {
+    int new_x = x + (IsHankaku(*s) ? 1 : 2);
+    if (new_x > max_width) {
+      return x;
+    }
+    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, *s, color);
+    x = new_x;
+    s++;
+  }
+  return x;
+}
+
 int CountUTF8Size(uint8_t c) {
   if (c < 0x80) {
     return 1;

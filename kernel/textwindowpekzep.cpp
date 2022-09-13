@@ -39,12 +39,22 @@ void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
   box.ClearTextWindow();
 
   // then render
+  const int max_width = (box.text_window->InnerSize().x - 8) / 8 - 1;
+
   box.DrawTextCursor(false);
-  int solidified_width = WriteUTF32CharVec(*box.text_window->InnerWriter(), Vector2D<int>{4, 6}, this->solidified, ToColor(0));
-  int unsolidified_width = WriteUTF32CharVec(
+  int solidified_width = WriteUTF32CharVecWithUpperLimit(
+    *box.text_window->InnerWriter(), 
+    Vector2D<int>{4, 6}, 
+    this->solidified, 
+    ToColor(0),
+    max_width
+  );
+  int unsolidified_width = WriteUTF32CharVecWithUpperLimit(
     *box.text_window->InnerWriter(), 
     Vector2D<int>{4 + 8 * solidified_width, 6}, 
-    this->non_solidified, ToColor(0xe916c3)
+    this->non_solidified, 
+    ToColor(0xe916c3),
+    max_width - solidified_width
   );
   box.cursor_index = solidified_width + unsolidified_width;
   box.DrawTextCursor(true);
@@ -52,7 +62,7 @@ void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
   if (non_solidified_is_updated) {
     ComputeCandidatesAndStore();
   }
-  // want to prepare a string of the form U"<此>時 火 車 善 子"
+  // prepares a string of the form U"<此>時 火 車 善 子"
   std::u32string candidate_display = U"";
   for (int i = 0; i < this->candidates.size(); i++) {
     candidate_display += i == this->candidate_index ? U"<" : i == this->candidate_index + 1 ? U">" : U" ";
@@ -62,15 +72,17 @@ void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
     candidate_display += U">";
   }
 
-  WriteUTF32String(*box.text_window->InnerWriter(), Vector2D<int>{4, 6 + 17 + 2}, candidate_display.c_str(), ToColor(0));
+  WriteUTF32StringWithUpperLimit(
+    *box.text_window->InnerWriter(), 
+    Vector2D<int>{4, 6 + 17 + 2}, 
+    candidate_display.c_str(), 
+    ToColor(0),
+    max_width
+  );
 }
 
 void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier, uint8_t keycode) {
-  static IMEState state = {
-    {U'我', U'心', U'口'},
-    {U'k', U'a', U'r'},
-  };
-
+  static IMEState state;
 
   if (keycode == 79 /* RightArrow */) {
     state.candidate_index++; // todo: error check
@@ -106,22 +118,5 @@ void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modif
     return;
   }
 
-/*
-  auto cursor_pos = [&box]() { return Vector2D<int>{4 + 8*box.cursor_index, 6}; };
-
-  const int max_chars = (box.text_window->InnerSize().x - 8) / 8 - 1;
-  if (unicode == U'\b' && box.cursor_index > 0) {
-    box.DrawTextCursor(false);
-    --box.cursor_index;
-    FillRectangle(*box.text_window->InnerWriter(), cursor_pos(), {8, 16}, ToColor(0xffffff));
-    box.DrawTextCursor(true);
-  } else if (unicode >= ' ' && box.cursor_index < max_chars) {
-    box.DrawTextCursor(false);
-    // TODO: This should fail once we allow inputting a fullwidth character from the keyboard
-    WriteUnicodeChar(*box.text_window->InnerWriter(), cursor_pos(), unicode, ToColor(0));
-    ++box.cursor_index;
-    box.DrawTextCursor(true);
-  }
-*/
   layer_manager->Draw(box.text_window_layer_id);
 }
