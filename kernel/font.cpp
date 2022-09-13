@@ -130,6 +130,20 @@ int WriteUTF32String(PixelWriter& writer, Vector2D<int> pos, const char32_t* s, 
   return x;
 }
 
+/**
+ * @returns the visual width of the string, given in the units of a halfwidth character
+ */
+int WriteUTF32CharVec(PixelWriter& writer, Vector2D<int> pos, const std::vector<char32_t>& vec, const PixelColor& color) {
+  int x = 0;
+  auto s = vec.begin();
+  while (s != vec.end()) {
+    WriteUnicodeChar(writer, pos + Vector2D<int>{8 * x, 0}, *s, color);
+    x += IsHankaku(*s) ? 1 : 2;
+    s++;
+  }
+  return x;
+}
+
 int CountUTF8Size(uint8_t c) {
   if (c < 0x80) {
     return 1;

@@ -232,7 +232,7 @@ extern "C" void KernelMainNewStack(
         }
       } else if (act == pekzep_text_window.text_window_layer_id) {
         if (msg->arg.keyboard.press) {
-          InputTextWindowPekzep(pekzep_text_window, msg->arg.keyboard.unicode, msg->arg.keyboard.modifier);
+          InputTextWindowPekzep(pekzep_text_window, msg->arg.keyboard.unicode, msg->arg.keyboard.modifier, msg->arg.keyboard.keycode);
         }
       } else if (msg->arg.keyboard.press &&
                  msg->arg.keyboard.keycode == 59 /* F2 */) {

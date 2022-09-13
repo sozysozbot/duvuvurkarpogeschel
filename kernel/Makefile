@@ -59,7 +59,7 @@ zenkaku.bin: zenkaku.txt
 zenkaku.o: zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
-praige_r_dict.c:
+praige_r_dict.cpp:
 	./download_and_convert_praige_dict.sh
 
 .%.d: %.bin

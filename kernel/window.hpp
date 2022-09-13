@@ -126,8 +126,8 @@ class ToplevelWindow : public Window {
   InnerAreaWriter* InnerWriter() { return &inner_writer_; }
   Vector2D<int> InnerSize() const;
 
- private:
   std::string title_;
+ private:
   InnerAreaWriter inner_writer_{*this};
 };
 

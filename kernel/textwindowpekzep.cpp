@@ -3,18 +3,18 @@
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
 #include "textwindowpekzep.hpp"
-#include "praige_r_dict.h"
+#include "praige_r_dict.hpp"
 
 struct IMEState {
   std::vector<char32_t> solidified;
   std::vector<char32_t> non_solidified;
-  std::vector<std::string> candidates;
   int candidate_index;
+  std::vector<std::u32string> candidates;
   void Render(CursoredTextBox& box);
   void ComputeCandidatesAndStore();
 };
 
-bool startsWith(const char* haystack, std::vector<char32_t>& needle) {
+bool startsWith(const char32_t* haystack, std::vector<char32_t>& needle) {
   for (int i = 0; i < needle.size() ; i++) {
     if (haystack[i] == '\0') { return false; }
     if (haystack[i] != needle[i]) { return false; }
@@ -24,6 +24,8 @@ bool startsWith(const char* haystack, std::vector<char32_t>& needle) {
 
 void IMEState::ComputeCandidatesAndStore() {
   this->candidates.clear();
+
+  if (this->non_solidified.empty()) return;
   for (PekzepChar *c = dict; c != dict_end; c++) {
     if (startsWith(c->praige, this->non_solidified)) {
       this->candidates.push_back(c->hanzi);
@@ -33,29 +35,59 @@ void IMEState::ComputeCandidatesAndStore() {
 }
 
 void IMEState::Render(CursoredTextBox& box) {
+  // first, erase everything
+  box.ClearTextWindow();
+
+  // then render
   box.DrawTextCursor(false);
-  int solidified_width = WriteUTF32String(*box.text_window->InnerWriter(), Vector2D<int>{4, 6}, this->solidified.data(), ToColor(0));
-  int unsolidified_width = WriteUTF32String(
+  int solidified_width = WriteUTF32CharVec(*box.text_window->InnerWriter(), Vector2D<int>{4, 6}, this->solidified, ToColor(0));
+  int unsolidified_width = WriteUTF32CharVec(
     *box.text_window->InnerWriter(), 
     Vector2D<int>{4 + 8 * solidified_width, 6}, 
-    this->non_solidified.data(), ToColor(0xe916c3)
+    this->non_solidified, ToColor(0xe916c3)
   );
   box.cursor_index = solidified_width + unsolidified_width;
   box.DrawTextCursor(true);
 
-  WriteUTF32String(*box.text_window->InnerWriter(), Vector2D<int>{4, 6 + 17 + 2}, U"[此] 時 火 車 善 子", ToColor(0));
+  ComputeCandidatesAndStore();
+  // want to prepare a string of the form U"[此]時 火 車 善 子"
+  std::u32string candidate_display;
+  for (int i = 0; i < this->candidates.size(); i++) {
+    candidate_display += i == this->candidate_index ? U"<" : i == this->candidate_index + 1 ? U">" : U" ";
+    candidate_display += this->candidates[i];
+  }
+  if (this->candidates.size() == this->candidate_index + 1) {
+    candidate_display += U">";
+  }
+
+  WriteUTF32String(*box.text_window->InnerWriter(), Vector2D<int>{4, 6 + 17 + 2}, candidate_display.c_str(), ToColor(0));
 }
 
-void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier) {
-  /*static*/ 
-  IMEState state = {};
-  state.solidified.push_back(U'我');
-  state.solidified.push_back(U'心');
-  state.solidified.push_back(U'口');
-  state.non_solidified.push_back(U'k');
-  state.non_solidified.push_back(U'a');
+void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier, uint8_t keycode) {
+  static IMEState state = {
+    {U'我', U'心', U'口'},
+    {U'k', U'a', U'r'},
+  };
 
-  state.Render(box);
+
+  if (keycode == 79 /* RightArrow */) {
+    state.candidate_index++; // todo: error check
+    state.Render(box);
+  } else if (keycode == 80 /* LeftArrow */) {
+    state.candidate_index--; // todo: error check
+    state.Render(box);
+  } else if (unicode == U'\b') {
+    box.DrawTextCursor(false);
+    if (!state.non_solidified.empty()) {
+      state.non_solidified.pop_back();
+    } else if (!state.solidified.empty()) {
+      state.solidified.pop_back();
+    }
+    state.Render(box);
+    box.DrawTextCursor(true);
+  } else if (unicode == U'a') {
+    box.ClearTextWindow();
+  }
 
   if (unicode == 0) {
     return;
