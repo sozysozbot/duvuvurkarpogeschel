@@ -2,8 +2,8 @@
 /hankaku.bin
 /hankaku.txt
 /asciilip.bin
-/praige_r.tsv
-/praige_r.dict.yaml
+/language/praige_r.tsv
+/language/praige_r.dict.yaml
 *.o
 .*.d
 *.swp

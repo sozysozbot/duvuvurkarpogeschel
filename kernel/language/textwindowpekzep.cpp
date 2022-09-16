@@ -4,7 +4,7 @@
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
 #include "language/textwindowpekzep.hpp"
-#include "praige_r_dict.hpp"
+#include "language/praige_r_dict.hpp"
 
 struct IMEState {
   std::vector<char32_t> solidified;
