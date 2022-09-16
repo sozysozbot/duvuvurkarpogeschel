@@ -1,10 +1,10 @@
 #include <vector>
 #include <algorithm>
-#include "language/font.hpp"
+#include "lang/font.hpp"
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
-#include "language/textwindowpekzep.hpp"
-#include "language/praige_r_dict.hpp"
+#include "lang/textwindowpekzep.hpp"
+#include "lang/praige_r_dict.hpp"
 
 struct IMEState {
   std::vector<char32_t> solidified;

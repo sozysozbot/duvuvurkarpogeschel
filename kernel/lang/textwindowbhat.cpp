@@ -1,9 +1,9 @@
 #include <vector>
 
-#include "language/font.hpp"
+#include "lang/font.hpp"
 #include "window.hpp"
 #include "layer.hpp"
-#include "language/textwindowbhat.hpp"
+#include "lang/textwindowbhat.hpp"
 #include "keyboard.hpp"
 #include "cursored_textbox.hpp"
 

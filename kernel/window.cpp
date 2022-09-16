@@ -1,7 +1,7 @@
 #include "window.hpp"
 
 #include "logger.hpp"
-#include "language/font.hpp"
+#include "lang/font.hpp"
 
 namespace {
   void DrawTextbox(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size,

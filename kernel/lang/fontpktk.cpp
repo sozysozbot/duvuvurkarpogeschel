@@ -4,8 +4,8 @@
  * pek_tak フォント描画のためのファイル.
  */
 
-#include "language/fontpktk.hpp"
-#include "language/font.hpp"
+#include "lang/fontpktk.hpp"
+#include "lang/font.hpp"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

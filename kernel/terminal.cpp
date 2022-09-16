@@ -4,7 +4,7 @@
 #include <cctype>
 #include <limits>
 
-#include "language/font.hpp"
+#include "lang/font.hpp"
 #include "layer.hpp"
 #include "pci.hpp"
 #include "asmfunc.h"

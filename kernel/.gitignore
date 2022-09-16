@@ -1,9 +1,9 @@
 /kernel.elf
-/language/hankaku.bin
-/language/hankaku.txt
-/language/asciilip.bin
-/language/praige_r.tsv
-/language/praige_r.dict.yaml
+/lang/hankaku.bin
+/lang/hankaku.txt
+/lang/asciilip.bin
+/lang/praige_r.tsv
+/lang/praige_r.dict.yaml
 *.o
 .*.d
 *.swp
