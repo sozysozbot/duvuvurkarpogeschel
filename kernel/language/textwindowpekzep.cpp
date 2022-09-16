@@ -3,7 +3,7 @@
 #include "language/font.hpp"
 #include "layer.hpp"
 #include "cursored_textbox.hpp"
-#include "textwindowpekzep.hpp"
+#include "language/textwindowpekzep.hpp"
 #include "praige_r_dict.hpp"
 
 struct IMEState {

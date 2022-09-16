@@ -1,5 +1,5 @@
 TARGET = kernel.elf
-OBJS = cursored_textbox.o main.o textwindow.o textwindowbhat.o textwindowpekzep.o \
+OBJS = cursored_textbox.o main.o textwindow.o language/textwindowbhat.o language/textwindowpekzep.o \
        graphics.o mouse.o language/font.o language/fontpktk.o \
        hankaku.o zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
 	   libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \

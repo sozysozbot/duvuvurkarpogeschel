@@ -40,8 +40,8 @@
 #include "syscall.hpp"
 #include "osbanner.h"
 #include "textwindow.hpp"
-#include "textwindowbhat.hpp"
-#include "textwindowpekzep.hpp"
+#include "language/textwindowbhat.hpp"
+#include "language/textwindowpekzep.hpp"
 #include "cursored_textbox.hpp"
 
 int printk(const char* format, ...) {
@@ -154,11 +154,11 @@ extern "C" void KernelMainNewStack(
   CursoredTextBox normal_text_window;
   normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {520, 70});
 
-  // pertinent to textwindowbhat.cpp
+  // pertinent to language/textwindowbhat.cpp
   CursoredTextBox bhat_text_window;
   bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {320, 15});
 
-  // pertinent to textwindowpekzep.cpp
+  // pertinent to language/textwindowpekzep.cpp
   CursoredTextBox pekzep_text_window;
   pekzep_text_window.InitializeTextWindow(368, 70, "pergvirle'i slahurfaesal", {320, 125}, 18);
 
