@@ -4,7 +4,7 @@
  * フォント描画のプログラムを集めたファイル.
  */
 
-#include "font.hpp"
+#include "language/font.hpp"
 
 #include <cstdlib>
 #include <vector>

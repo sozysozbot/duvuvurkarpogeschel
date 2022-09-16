@@ -13,7 +13,7 @@
 #include "timer.hpp"
 #include "task.hpp"
 #include "graphics.hpp"
-#include "font.hpp"
+#include "language/font.hpp"
 
 std::array<InterruptDescriptor, 256> idt;
 
