@@ -1,4 +1,4 @@
-#include "praige_r_dict.hpp"
+#include "lang/praige_r_dict.hpp"
 struct PekzepChar dict[] = {
 { U"我" , U"prai" },
 { U"汝" , U"mrua" },

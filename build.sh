@@ -1,9 +1,9 @@
 #!/bin/sh -eu
 
-cp kernel/asciilip.txt kernel/hankaku.txt
+cp kernel/lang/asciilip.txt kernel/lang/hankaku.txt
 if [ "${ALPHABET-}" = "latin" ]; then
   echo "Using Latin Alphabet";
-  cp kernel/asciilat.txt kernel/hankaku.txt
+  cp kernel/lang/asciilat.txt kernel/lang/hankaku.txt
 fi
 
 make ${MAKE_OPTS:-} -C kernel kernel.elf

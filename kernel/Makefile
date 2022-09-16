@@ -1,13 +1,16 @@
 TARGET = kernel.elf
-OBJS = cursored_textbox.o main.o textwindow.o textwindowbhat.o textwindowpekzep.o graphics.o mouse.o font.o fontpktk.o \
-       hankaku.o zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
-	   libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
-       window.o layer.o timer.o frame_buffer.o acpi.o keyboard.o task.o terminal.o \
-       fat.o syscall.o file.o praige_r_dict.o \
+OBJS = cursored_textbox.o main.o textwindow.o graphics.o task.o fat.o syscall.o \
+       newlib_support.o logger.o osbanner.o console.o asmfunc.o mouse.o timer.o \
+	   libcxx_support.o layer.o interrupt.o segment.o paging.o memory_manager.o \
+       window.o file.o frame_buffer.o keyboard.o pci.o terminal.o acpi.o \
+	   \
+       lang/font.o lang/zenkaku.o lang/textwindowbhat.o lang/textwindowpekzep.o \
+	   lang/hankaku.o lang/praige_r_dict.o lang/fontpktk.o \
+	   \
        usb/memory.o usb/device.o usb/xhci/ring.o usb/xhci/trb.o usb/xhci/xhci.o \
        usb/xhci/port.o usb/xhci/device.o usb/xhci/devmgr.o usb/xhci/registers.o \
-       usb/classdriver/base.o usb/classdriver/hid.o usb/classdriver/keyboard.o \
-       usb/classdriver/mouse.o
+       usb/classdriver/mouse.o usb/classdriver/hid.o usb/classdriver/keyboard.o \
+       usb/classdriver/base.o
 DEPENDS = $(join $(dir $(OBJS)),$(addprefix .,$(notdir $(OBJS:.o=.d))))
 
 CPPFLAGS += -I.
@@ -47,20 +50,20 @@ kernel.elf: $(OBJS) Makefile
 %.o: %.asm Makefile
 	nasm -f elf64 -o $@ $<
 
-hankaku.bin: hankaku.txt
+lang/hankaku.bin: lang/hankaku.txt
 	../tools/makefont.py --width 8 --height 16 -o $@ $<
 
-hankaku.o: hankaku.bin
+lang/hankaku.o: lang/hankaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
-zenkaku.bin: zenkaku.txt
+lang/zenkaku.bin: lang/zenkaku.txt
 	../tools/makefont.py --width 16 --height 16 -o $@ $<
 
-zenkaku.o: zenkaku.bin
+lang/zenkaku.o: lang/zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
-praige_r_dict.cpp:
-	./download_and_convert_praige_dict.sh
+lang/praige_r_dict.cpp:
+	../tools/download_and_convert_praige_dict.sh
 
 .%.d: %.bin
 	touch $@

@@ -17,8 +17,8 @@
 #include "memory_map.hpp"
 #include "graphics.hpp"
 #include "mouse.hpp"
-#include "font.hpp"
-#include "fontpktk.hpp"
+#include "lang/font.hpp"
+#include "lang/fontpktk.hpp"
 #include "console.hpp"
 #include "pci.hpp"
 #include "logger.hpp"
@@ -40,8 +40,8 @@
 #include "syscall.hpp"
 #include "osbanner.h"
 #include "textwindow.hpp"
-#include "textwindowbhat.hpp"
-#include "textwindowpekzep.hpp"
+#include "lang/textwindowbhat.hpp"
+#include "lang/textwindowpekzep.hpp"
 #include "cursored_textbox.hpp"
 
 int printk(const char* format, ...) {
@@ -154,11 +154,11 @@ extern "C" void KernelMainNewStack(
   CursoredTextBox normal_text_window;
   normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {520, 70});
 
-  // pertinent to textwindowbhat.cpp
+  // pertinent to lang/textwindowbhat.cpp
   CursoredTextBox bhat_text_window;
   bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {320, 15});
 
-  // pertinent to textwindowpekzep.cpp
+  // pertinent to lang/textwindowpekzep.cpp
   CursoredTextBox pekzep_text_window;
   pekzep_text_window.InitializeTextWindow(368, 70, "pergvirle'i slahurfaesal", {320, 125}, 18);
 

@@ -7,7 +7,7 @@
 #include "console.hpp"
 
 #include <cstring>
-#include "font.hpp"
+#include "lang/font.hpp"
 #include "layer.hpp"
 
 Console::Console(const PixelColor& fg_color, const PixelColor& bg_color)
