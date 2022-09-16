@@ -226,7 +226,7 @@ std::pair<char32_t, int> ConvertUTF8To32(const char* u8) {
 }
 
 /**
- * @returns hankaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
+ * @returns language/hankaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
  */
 const HalfwidthGlyph *GetGlyphFromHankakuBin(char32_t c) {
   // Look inside the halfwidth character table
@@ -242,7 +242,7 @@ const HalfwidthGlyph *GetGlyphFromHankakuBin(char32_t c) {
 }
 
 /**
- * @returns zenkaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
+ * @returns language/zenkaku.bin にグリフがあるときにはそのグリフ、無いなら nullptr
  */
 const FullwidthGlyph *GetGlyphFromZenkakuBin(char32_t c) {
   // Look inside the fullwidth character table

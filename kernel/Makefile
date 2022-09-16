@@ -1,7 +1,7 @@
 TARGET = kernel.elf
 OBJS = cursored_textbox.o main.o textwindow.o language/textwindowbhat.o language/textwindowpekzep.o \
        graphics.o mouse.o language/font.o language/fontpktk.o \
-       hankaku.o zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
+       language/hankaku.o language/zenkaku.o newlib_support.o osbanner.o console.o pci.o asmfunc.o \
 	   libcxx_support.o logger.o interrupt.o segment.o paging.o memory_manager.o \
        window.o layer.o timer.o frame_buffer.o acpi.o keyboard.o task.o terminal.o \
        fat.o syscall.o file.o language/praige_r_dict.o \
@@ -48,16 +48,16 @@ kernel.elf: $(OBJS) Makefile
 %.o: %.asm Makefile
 	nasm -f elf64 -o $@ $<
 
-hankaku.bin: hankaku.txt
+language/hankaku.bin: language/hankaku.txt
 	../tools/makefont.py --width 8 --height 16 -o $@ $<
 
-hankaku.o: hankaku.bin
+language/hankaku.o: language/hankaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
-zenkaku.bin: zenkaku.txt
+language/zenkaku.bin: language/zenkaku.txt
 	../tools/makefont.py --width 16 --height 16 -o $@ $<
 
-zenkaku.o: zenkaku.bin
+language/zenkaku.o: language/zenkaku.bin
 	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
 language/praige_r_dict.cpp:

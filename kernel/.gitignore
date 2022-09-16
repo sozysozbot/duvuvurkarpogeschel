@@ -1,6 +1,6 @@
 /kernel.elf
-/hankaku.bin
-/hankaku.txt
+/language/hankaku.bin
+/language/hankaku.txt
 /asciilip.bin
 /language/praige_r.tsv
 /language/praige_r.dict.yaml
