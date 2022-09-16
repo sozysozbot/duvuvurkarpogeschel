@@ -23,13 +23,13 @@ struct FullwidthGlyph {
   uint16_t glyph[16];
 };
 
-extern const HalfwidthGlyph _binary_hankaku_bin_start[];
-extern const HalfwidthGlyph _binary_hankaku_bin_end[];
-extern const uint8_t _binary_hankaku_bin_size;
+extern const HalfwidthGlyph _binary_lang_hankaku_bin_start[];
+extern const HalfwidthGlyph _binary_lang_hankaku_bin_end[];
+extern const uint8_t _binary_lang_hankaku_bin_size;
 
-extern const FullwidthGlyph _binary_zenkaku_bin_start[];
-extern const FullwidthGlyph _binary_zenkaku_bin_end[];
-extern const uint8_t _binary_zenkaku_bin_size;
+extern const FullwidthGlyph _binary_lang_zenkaku_bin_start[];
+extern const FullwidthGlyph _binary_lang_zenkaku_bin_end[];
+extern const uint8_t _binary_lang_zenkaku_bin_size;
 
 namespace {
 FT_Library ft_library;
@@ -89,7 +89,7 @@ void WriteGlitched(PixelWriter& writer, Vector2D<int> pos, const PixelColor& col
 [[deprecated("should always write in Unicode")]]
 void WriteAscii(PixelWriter& writer, Vector2D<int> pos, char c, const PixelColor& color) {
   HalfwidthGlyph gl = { static_cast<uint32_t>(c), {} };
-  const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
+  const HalfwidthGlyph *candidate = std::lower_bound(_binary_lang_hankaku_bin_start, _binary_lang_hankaku_bin_end, gl, CompHalfwidthGlyph);
   if (candidate->code_point == c) {
     const uint8_t *glyph = candidate->glyph;
     for (int dy = 0; dy < 16; ++dy) {
@@ -233,7 +233,7 @@ const HalfwidthGlyph *GetGlyphFromHankakuBin(char32_t c) {
   // The table should be sorted by the code point. Hence std::lower_bound suffices.
   // return the glyph if the codepoint exactly matches
   HalfwidthGlyph gl = { c, {} };
-  const HalfwidthGlyph *candidate = std::lower_bound(_binary_hankaku_bin_start, _binary_hankaku_bin_end, gl, CompHalfwidthGlyph);
+  const HalfwidthGlyph *candidate = std::lower_bound(_binary_lang_hankaku_bin_start, _binary_lang_hankaku_bin_end, gl, CompHalfwidthGlyph);
   if (candidate->code_point == c) { 
     return candidate; 
   } else { 
@@ -249,7 +249,7 @@ const FullwidthGlyph *GetGlyphFromZenkakuBin(char32_t c) {
   // The table should be sorted by the code point. Hence std::lower_bound suffices.
   // return the glyph if the codepoint exactly matches 
   FullwidthGlyph gl = { c, {} };
-  const FullwidthGlyph *candidate = std::lower_bound(_binary_zenkaku_bin_start, _binary_zenkaku_bin_end, gl, CompFullwidthGlyph);
+  const FullwidthGlyph *candidate = std::lower_bound(_binary_lang_zenkaku_bin_start, _binary_lang_zenkaku_bin_end, gl, CompFullwidthGlyph);
   if (candidate->code_point == c) {
     return candidate; 
   } else { 
