@@ -10,7 +10,7 @@
 
 #include "graphics.hpp"
 
-const int kMouseCursorWidth = 12;
+const int kMouseCursorWidth = 18;
 const int kMouseCursorHeight = 24;
 const PixelColor kMouseTransparentColor{0, 0, 1};
 
