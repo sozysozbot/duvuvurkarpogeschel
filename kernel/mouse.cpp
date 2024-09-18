@@ -36,6 +36,8 @@ namespace
       "     @@@@@@@@@@   ",
   };
 
+  const Vector2D<int> mouse_cursor_hitbox_offset = {10, 0};
+
   std::tuple<Layer *, uint64_t> FindActiveLayerTask()
   {
     const auto act = active_layer->GetActive();
@@ -136,22 +138,22 @@ Mouse::Mouse(unsigned int layer_id) : layer_id_{layer_id}
 {
 }
 
-void Mouse::SetPosition(Vector2D<int> position)
+void Mouse::SetLogicalPosition(Vector2D<int> logical_position)
 {
-  position_ = position;
-  layer_manager->Move(layer_id_, position_);
+  visual_position_ = logical_position - mouse_cursor_hitbox_offset;
+  layer_manager->Move(layer_id_, visual_position_);
 }
 
 void Mouse::OnInterrupt(uint8_t buttons, int8_t displacement_x, int8_t displacement_y)
 {
-  const auto oldpos = position_;
-  auto newpos = position_ + Vector2D<int>{displacement_x, displacement_y};
+  const auto oldpos = visual_position_;
+  auto newpos = visual_position_ + Vector2D<int>{displacement_x, displacement_y};
   newpos = ElementMin(newpos, ScreenSize() + Vector2D<int>{-1, -1});
-  position_ = ElementMax(newpos, {0, 0});
+  visual_position_ = ElementMax(newpos, {0, 0});
 
-  const auto posdiff = position_ - oldpos;
+  const auto posdiff = visual_position_ - oldpos;
 
-  layer_manager->Move(layer_id_, position_);
+  layer_manager->Move(layer_id_, visual_position_);
 
   unsigned int close_layer_id = 0;
 
@@ -159,10 +161,10 @@ void Mouse::OnInterrupt(uint8_t buttons, int8_t displacement_x, int8_t displacem
   const bool left_pressed = (buttons & 0x01);
   if (!previous_left_pressed && left_pressed)
   {
-    auto layer = layer_manager->FindLayerByPosition(position_, layer_id_);
+    auto layer = layer_manager->FindLayerByPosition(visual_position_, layer_id_);
     if (layer && layer->IsDraggable())
     {
-      const auto pos_layer = position_ - layer->GetPosition();
+      const auto pos_layer = visual_position_ + mouse_cursor_hitbox_offset - layer->GetPosition();
       switch (layer->GetWindow()->GetWindowRegion(pos_layer))
       {
       case WindowRegion::kTitleBar:
@@ -220,7 +222,7 @@ void InitializeMouse()
                             .ID();
 
   auto mouse = std::make_shared<Mouse>(mouse_layer_id);
-  mouse->SetPosition({200, 200});
+  mouse->SetLogicalPosition({200, 200});
   layer_manager->UpDown(mouse->LayerID(), std::numeric_limits<int>::max());
 
   usb::HIDMouseDriver::default_observer =
