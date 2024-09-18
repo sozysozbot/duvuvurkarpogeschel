@@ -6,6 +6,7 @@
 #include "layer.hpp"
 #include "usb/classdriver/mouse.hpp"
 #include "task.hpp"
+#include "console.hpp"
 
 namespace
 {
@@ -203,6 +204,7 @@ void Mouse::OnInterrupt(uint8_t buttons, int8_t displacement_x, int8_t displacem
     }
     else
     {
+      printk("mi festel lususo %dte jerldir.\n", close_layer_id);
       SendCloseMessage();
     }
   }
