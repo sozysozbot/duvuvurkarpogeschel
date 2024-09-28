@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstdio>
+#include <cassert>
 
 #include <deque>
 #include <limits>

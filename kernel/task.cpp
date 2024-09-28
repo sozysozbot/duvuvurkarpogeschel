@@ -1,3 +1,6 @@
+#include <cstring>
+#include <memory>
+
 #include "task.hpp"
 
 #include "asmfunc.h"
