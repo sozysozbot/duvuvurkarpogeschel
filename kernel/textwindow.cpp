@@ -3,7 +3,7 @@
 #include "cursored_textbox.hpp"
 #include "textwindow.hpp"
 
-void InputTextWindow(CursoredTextBox& box, char32_t unicode) {
+void InputTextWindow(PrivilegedCursoredTextBox& box, char32_t unicode) {
   if (unicode == 0) {
     return;
   }

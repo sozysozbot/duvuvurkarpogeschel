@@ -55,7 +55,7 @@ bool isAltPressed(uint8_t modifier) {
   return modifier & (kLAltBitMask | kRAltBitMask);
 }
 
-void InputTextWindowBhat(CursoredTextBox& box, char32_t unicode, uint8_t modifier) {
+void InputTextWindowBhat(PrivilegedCursoredTextBox& box, char32_t unicode, uint8_t modifier) {
   static std::vector<char32_t> content;
   if (unicode == 0) {
     return;

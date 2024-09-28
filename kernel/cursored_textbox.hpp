@@ -1,6 +1,6 @@
 #pragma once
 #include "window.hpp"
-struct CursoredTextBox {
+struct PrivilegedCursoredTextBox {
   unsigned long kTimer;
   bool cursor_visible = false;
   std::shared_ptr<ToplevelWindow> text_window;

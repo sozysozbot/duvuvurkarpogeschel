@@ -11,7 +11,7 @@ struct IMEState {
   std::vector<char32_t> non_solidified;
   int candidate_index;
   std::vector<std::u32string> candidates;
-  void Render(CursoredTextBox& box, bool non_solidified_is_updated);
+  void Render(PrivilegedCursoredTextBox& box, bool non_solidified_is_updated);
   void ComputeCandidatesAndStore();
 };
 
@@ -44,7 +44,7 @@ void IMEState::ComputeCandidatesAndStore() {
   this->candidate_index = 0;
 }
 
-void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
+void IMEState::Render(PrivilegedCursoredTextBox& box, bool non_solidified_is_updated) {
   // first, erase everything
   box.ClearTextWindow();
 
@@ -91,7 +91,7 @@ void IMEState::Render(CursoredTextBox& box, bool non_solidified_is_updated) {
   );
 }
 
-void InputTextWindowPekzep(CursoredTextBox& box, char32_t unicode, uint8_t modifier, uint8_t keycode) {
+void InputTextWindowPekzep(PrivilegedCursoredTextBox& box, char32_t unicode, uint8_t modifier, uint8_t keycode) {
   static IMEState state;
 
   if (keycode == 79 /* RightArrow */ && !state.candidates.empty()) {

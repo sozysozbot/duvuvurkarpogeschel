@@ -152,15 +152,15 @@ extern "C" void KernelMainNewStack(
   InitializeCounterWindow();
 
   // pertinent to textwindow.cpp
-  CursoredTextBox normal_text_window;
+  PrivilegedCursoredTextBox normal_text_window;
   normal_text_window.InitializeTextWindow(168, 52, "slahurfaesal", {520, 70});
 
   // pertinent to lang/textwindowbhat.cpp
-  CursoredTextBox bhat_text_window;
+  PrivilegedCursoredTextBox bhat_text_window;
   bhat_text_window.InitializeTextWindow(368, 52, "phertarsvirle'i slahurfaesal", {320, 15});
 
   // pertinent to lang/textwindowpekzep.cpp
-  CursoredTextBox pekzep_text_window;
+  PrivilegedCursoredTextBox pekzep_text_window;
   pekzep_text_window.InitializeTextWindow(368, 70, "pergvirle'i slahurfaesal", {320, 125}, 18);
 
   layer_manager->Draw({{0, 0}, ScreenSize()});
