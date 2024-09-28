@@ -187,7 +187,6 @@ void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
               ToColor(0x000000), ToColor(0xc6c6c6), ToColor(0x848484));
 }
 
-const uint8_t 常在[] = {0xe5, 0xB8, 0xB8, 0xE5, 0x9C, 0xA8};
 void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged) {
   const auto win_w = writer.Width();
   uint32_t bgcolor = 0x848484;
@@ -213,6 +212,6 @@ void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool i
       }
     }
   } else {
-    WriteUTF8String(writer, {win_w - 5 - kCloseButtonWidth, 5}, reinterpret_cast<const char*>(常在), ToColor(0xffffff));
+    WriteUTF8String(writer, {win_w - 5 - kCloseButtonWidth, 4}, u8"常在", ToColor(0xffffff));
   }
 }
