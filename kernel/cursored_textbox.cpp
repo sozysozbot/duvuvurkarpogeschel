@@ -12,14 +12,14 @@ void PrivilegedCursoredTextBox::SetTimer(int timer_id, double timer_sec)
 }
 
 void PrivilegedCursoredTextBox::ClearTextWindow() {
-  DrawWindow(*this->text_window->Writer(), this->text_window->title_.c_str());
+  DrawWindow(*this->text_window->Writer(), this->text_window->title_.c_str(), true /* is_privileged */);
   Vector2D<int> bottom{0, bottom_additional_margin};
   DrawTextbox(*this->text_window->InnerWriter(), {0, 0}, this->text_window->InnerSize() - bottom);
 }
 
 void PrivilegedCursoredTextBox::InitializeTextWindow(int win_w, int win_h, const char *title, Vector2D<int> pos, int bottom_additional_margin_) {
   this->text_window = std::make_shared<ToplevelWindow>(
-      win_w, win_h, screen_config.pixel_format, title);
+      win_w, win_h, screen_config.pixel_format, title, true /* is_privileged */);
   this->bottom_additional_margin = bottom_additional_margin_;
   Vector2D<int> bottom{0, bottom_additional_margin};
   DrawTextbox(*this->text_window->InnerWriter(), {0, 0}, this->text_window->InnerSize() - bottom);

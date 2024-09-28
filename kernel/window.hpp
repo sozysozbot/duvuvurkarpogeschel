@@ -117,7 +117,7 @@ class ToplevelWindow : public Window {
   };
 
   ToplevelWindow(int width, int height, PixelFormat shadow_format,
-                 const std::string& title);
+                 const std::string& title, bool is_privileged);
 
   virtual void Activate() override;
   virtual void Deactivate() override;
@@ -129,9 +129,10 @@ class ToplevelWindow : public Window {
   std::string title_;
  private:
   InnerAreaWriter inner_writer_{*this};
+  bool is_privileged_{false};
 };
 
-void DrawWindow(PixelWriter& writer, const char* title);
+void DrawWindow(PixelWriter& writer, const char* title, bool is_privileged);
 void DrawTextbox(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size);
 void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size);
-void DrawWindowTitle(PixelWriter& writer, const char* title, bool active);
+void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged);

@@ -297,7 +297,7 @@ Terminal::Terminal(Task& task, const TerminalDescriptor* term_desc)
         kColumns * 8 + 8 + ToplevelWindow::kMarginX,
         kRows * 16 + 8 + ToplevelWindow::kMarginY,
         screen_config.pixel_format,
-        "duvuvurkerserfer");
+        "duvuvurkerserfer", false /* is_privileged */);
     DrawTerminal(*window_->InnerWriter(), {0, 0}, window_->InnerSize());
 
     layer_id_ = layer_manager->NewLayer()

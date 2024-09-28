@@ -62,7 +62,7 @@ std::shared_ptr<ToplevelWindow> counter_window;
 unsigned int counter_window_layer_id;
 void InitializeCounterWindow() {
   counter_window = std::make_shared<ToplevelWindow>(
-      160, 52, screen_config.pixel_format, "kinfiter");
+      160, 52, screen_config.pixel_format, "kinfiter", true /* is_privileged */);
 
   counter_window_layer_id = layer_manager->NewLayer()
     .SetWindow(counter_window)

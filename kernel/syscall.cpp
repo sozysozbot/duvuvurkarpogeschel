@@ -70,7 +70,7 @@ SYSCALL(OpenWindow) {
   const int w = arg1, h = arg2, x = arg3, y = arg4;
   const auto title = reinterpret_cast<const char*>(arg5);
   const auto win = std::make_shared<ToplevelWindow>(
-      w, h, screen_config.pixel_format, title);
+      w, h, screen_config.pixel_format, title, false /* is_privileged */);
 
   __asm__("cli");
   const auto layer_id = layer_manager->NewLayer()

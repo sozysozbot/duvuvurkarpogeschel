@@ -124,19 +124,19 @@ WindowRegion Window::GetWindowRegion(Vector2D<int> pos) {
 }
 
 ToplevelWindow::ToplevelWindow(int width, int height, PixelFormat shadow_format,
-                               const std::string& title)
-    : Window{width, height, shadow_format}, title_{title} {
-  DrawWindow(*Writer(), title_.c_str());
+                               const std::string& title, bool is_privileged)
+    : Window{width, height, shadow_format}, title_{title}, is_privileged_{is_privileged} {
+  DrawWindow(*Writer(), title_.c_str(), is_privileged);
 }
 
 void ToplevelWindow::Activate() {
   Window::Activate();
-  DrawWindowTitle(*Writer(), title_.c_str(), true);
+  DrawWindowTitle(*Writer(), title_.c_str(), true, this->is_privileged_);
 }
 
 void ToplevelWindow::Deactivate() {
   Window::Deactivate();
-  DrawWindowTitle(*Writer(), title_.c_str(), false);
+  DrawWindowTitle(*Writer(), title_.c_str(), false, this->is_privileged_);
 }
 
 WindowRegion ToplevelWindow::GetWindowRegion(Vector2D<int> pos) {
@@ -157,7 +157,7 @@ Vector2D<int> ToplevelWindow::InnerSize() const {
   return Size() - kTopLeftMargin - kBottomRightMargin;
 }
 
-void DrawWindow(PixelWriter& writer, const char* title) {
+void DrawWindow(PixelWriter& writer, const char* title, bool is_privileged) {
   auto fill_rect = [&writer](Vector2D<int> pos, Vector2D<int> size, uint32_t c) {
     FillRectangle(writer, pos, size, ToColor(c));
   };
@@ -174,7 +174,7 @@ void DrawWindow(PixelWriter& writer, const char* title) {
   fill_rect({1, win_h - 2}, {win_w - 2, 1},         0x848484);
   fill_rect({0, win_h - 1}, {win_w, 1},             0x000000);
 
-  DrawWindowTitle(writer, title, false);
+  DrawWindowTitle(writer, title, false, is_privileged);
 }
 
 void DrawTextbox(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
@@ -187,11 +187,11 @@ void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
               ToColor(0x000000), ToColor(0xc6c6c6), ToColor(0x848484));
 }
 
-void DrawWindowTitle(PixelWriter& writer, const char* title, bool active) {
+void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged) {
   const auto win_w = writer.Width();
   uint32_t bgcolor = 0x848484;
   if (active) {
-    bgcolor = 0x000084;
+    bgcolor = is_privileged ? 0x005242 : 0x000084;
   }
 
   FillRectangle(writer, {3, 3}, {win_w - 6, 18}, ToColor(bgcolor));
