@@ -187,6 +187,7 @@ void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
               ToColor(0x000000), ToColor(0xc6c6c6), ToColor(0x848484));
 }
 
+const uint8_t 常在[] = {0xe5, 0xB8, 0xB8, 0xE5, 0x9C, 0xA8};
 void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged) {
   const auto win_w = writer.Width();
   uint32_t bgcolor = 0x848484;
@@ -197,17 +198,21 @@ void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool i
   FillRectangle(writer, {3, 3}, {win_w - 6, 18}, ToColor(bgcolor));
   WriteUTF8String(writer, {24, 4}, title, ToColor(0xffffff));
 
-  for (int y = 0; y < kCloseButtonHeight; ++y) {
-    for (int x = 0; x < kCloseButtonWidth; ++x) {
-      PixelColor c = ToColor(0xffffff);
-      if (close_button[y][x] == '@') {
-        c = ToColor(0x000000);
-      } else if (close_button[y][x] == '$') {
-        c = ToColor(0x848484);
-      } else if (close_button[y][x] == ':') {
-        c = ToColor(0xc6c6c6);
+  if (!is_privileged) {
+    for (int y = 0; y < kCloseButtonHeight; ++y) {
+      for (int x = 0; x < kCloseButtonWidth; ++x) {
+        PixelColor c = ToColor(0xffffff);
+        if (close_button[y][x] == '@') {
+          c = ToColor(0x000000);
+        } else if (close_button[y][x] == '$') {
+          c = ToColor(0x848484);
+        } else if (close_button[y][x] == ':') {
+          c = ToColor(0xc6c6c6);
+        }
+        writer.Write({win_w - 5 - kCloseButtonWidth + x, 5 + y}, c);
       }
-      writer.Write({win_w - 5 - kCloseButtonWidth + x, 5 + y}, c);
     }
+  } else {
+    WriteUTF8String(writer, {win_w - 5 - kCloseButtonWidth, 5}, reinterpret_cast<const char*>(常在), ToColor(0xffffff));
   }
 }
