@@ -238,7 +238,10 @@ void DrawWindowTitle(PixelWriter& writer, const char* title, WindowTitleBarState
         } else if (close_button[y][x] == '$') {
           c = ToColor(0x848484);
         } else if (close_button[y][x] == ':') {
-          c = ToColor(0xc6c6c6);
+          c = title_state.state_of_closing == WindowTitleBarState::closeButtonHovered ? 
+            ToColor(0xc6c6c6) :
+            ToColor(0xffbf00)
+          ;
         }
         writer.Write({win_w - 5 - kCloseButtonWidth + x, 5 + y}, c);
       }
