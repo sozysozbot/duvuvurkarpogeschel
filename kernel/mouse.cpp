@@ -199,6 +199,22 @@ void Mouse::OnInterrupt(uint8_t buttons, int8_t displacement_x, int8_t displacem
   {
     drag_layer_id_ = 0;
   }
+  else { // hover
+    auto layer = layer_manager->FindLayerByPosition(visual_position_, layer_id_);
+    if (layer)
+    {
+      const auto pos_layer = visual_position_ + mouse_cursor_hitbox_offset - layer->GetPosition();
+      switch (layer->GetWindow()->GetWindowRegion(pos_layer))
+      {
+      case WindowRegion::kCloseButton:
+        active_layer->MouseEnterIntoCloseButton(layer->ID());
+        break;
+      default:
+        active_layer->MouseLeaveFromCloseButton(layer->ID());
+        break;
+      }
+    }
+  }
 
   if (drag_layer_id_ == 0)
   {

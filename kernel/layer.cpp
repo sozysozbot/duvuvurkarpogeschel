@@ -251,6 +251,16 @@ void ActiveLayer::Activate(unsigned int layer_id) {
   }
 }
 
+void ActiveLayer::MouseEnterIntoCloseButton(unsigned int layer_id) {
+  Layer* layer = manager_.FindLayer(layer_id);
+  layer->GetWindow()->MouseEnterIntoCloseButton(active_layer_ == layer_id);
+}
+
+void ActiveLayer::MouseLeaveFromCloseButton(unsigned int layer_id) {
+  Layer* layer = manager_.FindLayer(layer_id);
+  layer->GetWindow()->MouseLeaveFromCloseButton(active_layer_ == layer_id);
+}
+
 ActiveLayer* active_layer;
 std::map<unsigned int, uint64_t>* layer_task_map;
 

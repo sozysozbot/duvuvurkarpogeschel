@@ -164,6 +164,30 @@ void ToplevelWindow::Deactivate() {
   );
 }
 
+void ToplevelWindow::MouseEnterIntoCloseButton(bool is_already_active) {
+  Window::Activate();
+  DrawWindowTitle(
+    *Writer(), 
+    title_.c_str(), 
+    WindowTitleBarState {
+      is_already_active, 
+      this->is_privileged_ ? WindowTitleBarState::isPrivilegedAndUnclosable : WindowTitleBarState::closeButtonHovered
+    }
+  );
+}
+
+void ToplevelWindow::MouseLeaveFromCloseButton(bool is_already_active) {
+  Window::Activate();
+  DrawWindowTitle(
+    *Writer(), 
+    title_.c_str(), 
+    WindowTitleBarState {
+      is_already_active, 
+      this->is_privileged_ ? WindowTitleBarState::isPrivilegedAndUnclosable : WindowTitleBarState::normal
+    }
+  );
+}
+
 WindowRegion ToplevelWindow::GetWindowRegion(Vector2D<int> pos) {
   if (pos.x < 2 || Width() - 2 <= pos.x ||
       pos.y < 2 || Height() - 2 <= pos.y) {
@@ -239,8 +263,7 @@ void DrawWindowTitle(PixelWriter& writer, const char* title, WindowTitleBarState
           c = ToColor(0x848484);
         } else if (close_button[y][x] == ':') {
           c = title_state.state_of_closing == WindowTitleBarState::closeButtonHovered ? 
-            ToColor(0xc6c6c6) :
-            ToColor(0xffbf00)
+            ToColor(0xffbf00) : ToColor(0xc6c6c6)
           ;
         }
         writer.Write({win_w - 5 - kCloseButtonWidth + x, 5 + y}, c);

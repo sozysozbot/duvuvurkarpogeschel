@@ -109,6 +109,8 @@ class ActiveLayer {
   ActiveLayer(LayerManager& manager);
   void SetMouseLayer(unsigned int mouse_layer);
   void Activate(unsigned int layer_id);
+  void MouseEnterIntoCloseButton(unsigned int layer_id);
+  void MouseLeaveFromCloseButton(unsigned int layer_id);
   unsigned int GetActive() const { return active_layer_; }
 
  private:
