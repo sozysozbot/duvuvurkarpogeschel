@@ -146,7 +146,7 @@ WindowRegion ToplevelWindow::GetWindowRegion(Vector2D<int> pos) {
   } else if (pos.y < kTopLeftMargin.y) {
     if (Width() - 5 - kCloseButtonWidth <= pos.x && pos.x < Width() - 5 &&
         5 <= pos.y && pos.y < 5 + kCloseButtonHeight) {
-      return WindowRegion::kCloseButton;
+      return this->is_privileged_ ? WindowRegion::kTitleBar : WindowRegion::kCloseButton;
     }
     return WindowRegion::kTitleBar;
   }
