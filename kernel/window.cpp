@@ -44,6 +44,17 @@ namespace {
   };
 }
 
+struct WindowTitleBarState {
+  bool active;
+  enum {
+    normal,
+    closeButtonHovered,
+    isPrivilegedAndUnclosable,
+  } state_of_closing;
+};
+
+void DrawWindowTitle(PixelWriter& writer, const char* title, WindowTitleBarState title_state);
+
 Window::Window(int width, int height, PixelFormat shadow_format) : width_{width}, height_{height} {
   data_.resize(height);
   for (int y = 0; y < height; ++y) {
@@ -131,12 +142,26 @@ ToplevelWindow::ToplevelWindow(int width, int height, PixelFormat shadow_format,
 
 void ToplevelWindow::Activate() {
   Window::Activate();
-  DrawWindowTitle(*Writer(), title_.c_str(), true, this->is_privileged_);
+  DrawWindowTitle(
+    *Writer(), 
+    title_.c_str(), 
+    WindowTitleBarState {
+      true, 
+      this->is_privileged_ ? WindowTitleBarState::isPrivilegedAndUnclosable : WindowTitleBarState::normal 
+    }
+  );
 }
 
 void ToplevelWindow::Deactivate() {
   Window::Deactivate();
-  DrawWindowTitle(*Writer(), title_.c_str(), false, this->is_privileged_);
+  DrawWindowTitle(
+    *Writer(), 
+    title_.c_str(), 
+    WindowTitleBarState {
+      false, 
+      this->is_privileged_ ? WindowTitleBarState::isPrivilegedAndUnclosable : WindowTitleBarState::normal 
+    }
+  );
 }
 
 WindowRegion ToplevelWindow::GetWindowRegion(Vector2D<int> pos) {
@@ -174,7 +199,14 @@ void DrawWindow(PixelWriter& writer, const char* title, bool is_privileged) {
   fill_rect({1, win_h - 2}, {win_w - 2, 1},         0x848484);
   fill_rect({0, win_h - 1}, {win_w, 1},             0x000000);
 
-  DrawWindowTitle(writer, title, false, is_privileged);
+  DrawWindowTitle(
+    writer, 
+    title, 
+    WindowTitleBarState {
+      false, 
+      is_privileged ? WindowTitleBarState::isPrivilegedAndUnclosable : WindowTitleBarState::normal 
+    }
+  );
 }
 
 void DrawTextbox(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
@@ -187,17 +219,17 @@ void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size) {
               ToColor(0x000000), ToColor(0xc6c6c6), ToColor(0x848484));
 }
 
-void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged) {
+void DrawWindowTitle(PixelWriter& writer, const char* title, WindowTitleBarState title_state) {
   const auto win_w = writer.Width();
   uint32_t bgcolor = 0x848484;
-  if (active) {
-    bgcolor = is_privileged ? 0x005242 : 0x000084;
+  if (title_state.active) {
+    bgcolor = title_state.state_of_closing == WindowTitleBarState::isPrivilegedAndUnclosable ? 0x005242 : 0x000084;
   }
 
   FillRectangle(writer, {3, 3}, {win_w - 6, 18}, ToColor(bgcolor));
   WriteUTF8String(writer, {24, 4}, title, ToColor(0xffffff));
 
-  if (!is_privileged) {
+  if (title_state.state_of_closing != WindowTitleBarState::isPrivilegedAndUnclosable) {
     for (int y = 0; y < kCloseButtonHeight; ++y) {
       for (int x = 0; x < kCloseButtonWidth; ++x) {
         PixelColor c = ToColor(0xffffff);

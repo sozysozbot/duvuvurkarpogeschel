@@ -135,4 +135,3 @@ class ToplevelWindow : public Window {
 void DrawWindow(PixelWriter& writer, const char* title, bool is_privileged);
 void DrawTextbox(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size);
 void DrawTerminal(PixelWriter& writer, Vector2D<int> pos, Vector2D<int> size);
-void DrawWindowTitle(PixelWriter& writer, const char* title, bool active, bool is_privileged);
